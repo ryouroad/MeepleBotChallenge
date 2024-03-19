@@ -1,4 +1,4 @@
-# boardgame_bot_challeange
+# boardgame_bot_challenge
 
 ## Project setup
 ```
