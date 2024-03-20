@@ -2,7 +2,7 @@
   <div id="app">
     <header>
       <!-- ヘッダーの内容 -->
-      <h1>ボドゲボットの挑戦</h1>
+      <h1>ミープルボットの挑戦</h1>
     </header>
 
     <main>
@@ -15,7 +15,7 @@
 
     <footer>
       <!-- フッターの内容 -->
-      <p>© 2024 ボドゲボットの挑戦. All rights reserved.</p>
+      <p>© 2024 ミープルボットの挑戦. All rights reserved.</p>
     </footer>
   </div>
 </template>
