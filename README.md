@@ -1,4 +1,4 @@
-# boardgame_bot_challenge
+# MeepleBotChallenge
 
 ## Project setup
 ```
