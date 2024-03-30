@@ -1,0 +1,31 @@
+<!-- ChatInput.vue -->
+<template>
+    <div class="chat-input">
+        <!-- ローディング中はインジケータを表示 -->
+        <p v-if="isChatLoading">ミープルボットが考え中...</p>
+        <!-- ローディングでないときはボタンを表示 -->
+        <input v-else  v-model="input" @keyup.enter="send" placeholder="ミープルボットへの質問を入れてください..." />
+    </div>
+</template>
+
+<script>
+import { mapState } from 'vuex';
+
+export default {
+    data() {
+        return { input: '' }
+    },
+    computed: {
+        ...mapState({
+            isChatLoading: state => state.reversiStore.isChatLoading,
+        }),
+    },
+    methods: {
+        send() {
+            this.$emit('send', this.input)
+            this.input = ''
+        },
+    },
+}
+</script>
+  
