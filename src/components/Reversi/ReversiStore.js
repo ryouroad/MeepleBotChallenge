@@ -70,6 +70,7 @@ function calculateValidMoves(board, color) {
 
 
 export const reversiStore = {
+    namespaced: true,
     state: {
         game: {
             board: Array(8).fill().map((_, i) => Array(8).fill().map((_, j) => {
@@ -173,7 +174,7 @@ export const reversiStore = {
         handleMove({ commit, state, dispatch }, { x, y }) {
             const color = state.game.currentPlayer;
             if (!isValidMove(state.game.board, x, y, color)) {
-                // console.error("Invalid move");
+                console.error("Invalid move");
                 return;
             }
             commit('setBoard', { x, y, color });

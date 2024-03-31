@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import App from '@/App.vue'
 import ArticleViewer from '@/components/Article/ArticleViewer.vue';
 import ReversiViewer from '@/components/Reversi/ReversiViewer.vue';
+import ChessViewer from '@/components/Chess/ChessViewer.vue';
 
 const routes = [
   {
@@ -21,6 +22,13 @@ const routes = [
     name: 'Reversi',
     components: {
       Main: ReversiViewer
+    },
+  },
+  {
+    path: '/chess',
+    name: 'Chess',
+    components: {
+      Main: ChessViewer
     },
   }
 ];

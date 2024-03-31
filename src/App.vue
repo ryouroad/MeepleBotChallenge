@@ -23,6 +23,7 @@
           <section id="boardgame">
             <h2>ミープルボットとのゲーム</h2>
             <li><router-link :to="`/reversi`">リバーシ</router-link></li>
+            <li><router-link :to="`/chess`">チェス</router-link></li>
           </section>
           
           <section id="meeplebot">
