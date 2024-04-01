@@ -73,7 +73,7 @@ export const chessStore = {
             state.game.currentPlayer = state.game.currentPlayer === 'Black' ? 'White' : 'Black';
         },
         setPossibleMoves(state, moves) {
-            console.log("setPossibleMoves")
+            // console.log("setPossibleMoves")
         
             // 新しいボードを作成して、すべてのisPossibleMoveをfalseにリセット
             const newBoard = state.game.board.map(row => 
@@ -85,7 +85,7 @@ export const chessStore = {
                 if (newBoard[y] && newBoard[y][x]) {
                     // 直接newBoardを更新
                     newBoard[y][x] = { ...newBoard[y][x], isPossibleMove: true };
-                    console.log(x, y);
+                    // console.log(x, y);
                 }
             });
             
@@ -111,7 +111,7 @@ export const chessStore = {
                 if (piece.type === 'Pawn') {
                     const { x, y } = position;
                     const direction = piece.color === 'White' ? -1 : 1; // 白は上(-1)に、黒は下(1)に進む
-                    console.log(`Pawn move check ${x},${y},${direction}`);
+                    // console.log(`Pawn move check ${x},${y},${direction}`);
                     
                     // ポーンの基本的な前進
                     if (state.game.board[y + direction]?.[x].type === null) {
@@ -136,12 +136,12 @@ export const chessStore = {
                     // 水平方向の移動可能性をチェック
                     for (let dx = -1; dx <= 1; dx += 2) {
                         let newX = x + dx;
-                        while (newX >= 0 && newX < 8 && state.game.board[y][newX] === null) {
+                        while (newX >= 0 && newX < 8 && state.game.board[y][newX].color === null) {
                             possibleMoves.push({ x: newX, y });
                             newX += dx;
                         }
                         // 他の色のピースを取ることができるかチェック
-                        if (newX >= 0 && newX < 8 && state.game.board[y][newX]?.color !== piece.color) {
+                        if (newX >= 0 && newX < 8 && state.game.board[y][newX].color !== piece.color) {
                             possibleMoves.push({ x: newX, y });
                         }
                     }
@@ -149,12 +149,12 @@ export const chessStore = {
                     // 垂直方向の移動可能性をチェック
                     for (let dy = -1; dy <= 1; dy += 2) {
                         let newY = y + dy;
-                        while (newY >= 0 && newY < 8 && state.game.board[newY][x] === null) {
+                        while (newY >= 0 && newY < 8 && state.game.board[newY][x].color === null) {
                             possibleMoves.push({ x, y: newY });
                             newY += dy;
                         }
                         // 他の色のピースを取ることができるかチェック
-                        if (newY >= 0 && newY < 8 && state.game.board[newY][x]?.color !== piece.color) {
+                        if (newY >= 0 && newY < 8 && state.game.board[newY][x].color !== piece.color) {
                             possibleMoves.push({ x, y: newY });
                         }
                     }
@@ -196,12 +196,12 @@ export const chessStore = {
                             
                             // 次のマスが空いていれば、可能な移動として追加
                             if (state.game.board[newY][newX].color === null) {
-                                console.log(`Bishop add ${newX},${newY}`)
+                                // console.log(`Bishop add ${newX},${newY}`)
                                 possibleMoves.push({ x: newX, y: newY });
                             } else {
                                 // 他の色のピースを取ることができるかチェックし、できれば追加してループを抜ける
                                 if (state.game.board[newY][newX].color !== piece.color) {
-                                    console.log(`Bishop take ${newX},${newY}`)
+                                    // console.log(`Bishop take ${newX},${newY}`)
                                     possibleMoves.push({ x: newX, y: newY });
                                 }
                                 break; // 自分のピースまたは相手のピースに遭遇したらループを抜ける
@@ -227,7 +227,7 @@ export const chessStore = {
                     });
                 }            
             }
-            console.log(possibleMoves)
+            // console.log(possibleMoves)
         
             // 計算した移動可能なマスをステートにコミット
             if(possibleMoves.length > 0){
@@ -238,10 +238,52 @@ export const chessStore = {
             return possibleMoves
         },
         // ピースを移動させるアクション
-        performMove({ commit }, { from, to }) {
+        performMove({ dispatch, commit }, { from, to }) {
             commit('movePiece', { from, to });
+            dispatch('checkForEndGame');
             commit('clearPossibleMoves');
             commit('clearFrom');
+        },
+        checkForEndGame({ dispatch, state, commit }) {
+            // キングの存在確認
+            let whiteKingPresent = false;
+            let blackKingPresent = false;
+            const movePromises = [];
+        
+            // 各ピースに対して可能な移動を計算
+            state.game.board.forEach((row, y) => {
+              row.forEach((cell, x) => {
+                if (cell.type === "King") {
+                  if (cell.color === "White") whiteKingPresent = true;
+                  if (cell.color === "Black") blackKingPresent = true;
+                }
+        
+                // 合法的な移動が存在するかどうかを計算
+                if (cell.type) {
+                    const movePromise = dispatch('calculatePossibleMoves', { piece: cell, position: { x, y } })
+                    .then(moves => {
+                      if (moves.length > 0) {
+                        return true; // 可能な移動がある
+                      }
+                      return false; // 可能な移動がない
+                    });
+                    movePromises.push(movePromise);
+                }
+              });
+            });
+        
+            // 勝敗の決定
+            // 全ての可能な移動の計算後に実行
+            Promise.all(movePromises).then(results => {
+                const possibleMoves = results.filter(result => result === true).length;
+                if (!whiteKingPresent) {
+                  commit('setWinner', 'Black');
+                } else if (!blackKingPresent) {
+                  commit('setWinner', 'White');
+                } else if (possibleMoves === 0) {
+                  commit('setWinner', 'Draw');
+                }
+            });
         },
     },
       

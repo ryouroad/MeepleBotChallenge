@@ -29,6 +29,7 @@ const squareClass = computed(() => {
 
 const squareClicked = () => {
     console.log(`Square clicked: ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
+    if(store.state.chessStore.game.winner != null) return;
     // 移動元を選択済の場合
     if(store.state.chessStore.game.from != null){
         // 動ければ移動先にコマを移動する
