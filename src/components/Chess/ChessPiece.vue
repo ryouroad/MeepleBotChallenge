@@ -17,7 +17,7 @@ export default {
       if (this.piece.type === null) {
         return '';
       }
-      return `/Chess/${this.piece.type}.webp`;
+      return `${require('@/assets/Chess/'+this.piece.type+'.webp')}`;
     },
   },
 };

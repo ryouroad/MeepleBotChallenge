@@ -3,7 +3,7 @@
   <div class="board">
     <div v-for="(row, i) in board" :key="i" class="row">
       <div v-for="(cell, j) in row" :key="j">
-          <BoardCell :state="cell" @click="() => handleMove({ x: j, y: i })" />
+          <BoardCell :state="cell" @click="() => this.handleMove({ x: j, y: i })" />
       </div>
     </div>
   </div>
@@ -18,8 +18,9 @@ export default {
   computed: mapState({
     board: state => state.reversiStore.game.board,
   }),
-  methods: mapActions(['handleMove']),
-}
+  methods: {
+    ...mapActions('reversiStore', ['handleMove']),
+  },}
 </script>
 
 <style scoped>

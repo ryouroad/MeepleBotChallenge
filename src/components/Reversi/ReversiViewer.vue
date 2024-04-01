@@ -35,7 +35,7 @@ export default {
     game: state => state.reversiStore.game,
     chat: state => state.reversiStore.chat
   }),
-  methods: mapActions(['sendMessage', 'sendFeedback']),
+  methods: mapActions('reversiStore', ['sendMessage', 'sendFeedback']),
 }
 </script>
 

@@ -45,72 +45,6 @@ export const chessStore = {
         setWinner(state, winner) {
             state.game.winner = winner; // winnerを状態に保存
         },
-        checkForEndGame(state) {
-            // 勝敗判定のロジックをここに実装
-            const hasLegalMove = this.calculateHasLegalMove(state);
-            const isCheck = this.isKingInCheck(state);
-    
-            if (!hasLegalMove) {
-                if (isCheck) {
-                    // チェックメイトの場合
-                    state.game.winner = state.game.currentPlayer === 'Black' ? 'White' : 'Black';
-                    state.game.isGameOver = true;
-                } else {
-                    // ステイルメイトの場合
-                    state.game.isGameOver = true;
-                    state.game.winner = 'Draw'; // 引き分け
-                }
-            }
-        },
-        calculateHasLegalMove(state) {
-            for (let y = 0; y < 8; y++) {
-                for (let x = 0; x < 8; x++) {
-                    const cell = state.game.board[y][x];
-                    // ピースが現在のプレイヤーのものであるか確認
-                    if (cell && cell.color === state.game.currentPlayer) {
-                        // このピースに対して可能な全ての移動を計算
-                        const possibleMoves = this.calculatePossibleMoves(state, cell.piece, { x, y });
-                        if (possibleMoves.length > 0) {
-                            // 少なくとも1つの合法的な手が見つかった
-                            return true;
-                        }
-                    }
-                }
-            }
-            // 合法的な手が1つも見つからなかった
-            return false;
-        },
-        isKingInCheck(state) {
-            // キングの位置を特定
-            let kingPosition = { x: -1, y: -1 };
-            for (let y = 0; y < state.game.board.length; y++) {
-                for (let x = 0; x < state.game.board[y].length; x++) {
-                    const piece = state.game.board[y][x];
-                    if (piece && piece.type === 'King' && piece.color === state.game.currentPlayer) {
-                        kingPosition = { x, y };
-                        break;
-                    }
-                }
-                if (kingPosition.x !== -1) break;
-            }
-    
-            // 全ての敵のピースを確認し、キングに到達できるかチェック
-            for (let y = 0; y < state.game.board.length; y++) {
-                for (let x = 0; x < state.game.board[y].length; x++) {
-                    const piece = state.game.board[y][x];
-                    if (piece && piece.color !== state.game.currentPlayer) {
-                        // このピースからキングへの攻撃が可能か確認
-                        const possibleMoves = this.calculatePossibleMoves(piece, { x, y })
-                        const isKingInCheck = possibleMoves.some(move => move.x === kingPosition.x && move.y === kingPosition.y);
-                        if (isKingInCheck) {
-                            console.log("キングはチェックされています。");
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        },
         setIsNextMoveLoading(state, isNextMoveLoading) {
             state.isNextMoveLoading = isNextMoveLoading;
         },
@@ -132,8 +66,9 @@ export const chessStore = {
         // ピースを移動させる
         movePiece(state, { from, to }) {
             const piece = state.game.board[from.y][from.x];
-            state.game.board[to.y][to.x] = piece;
-            state.game.board[from.y][from.x] = null;
+            state.game.board[to.y][to.x] = Object.assign({}, piece);
+            state.game.board[from.y][from.x].type = null;
+            state.game.board[from.y][from.x].color = null;
             // プレイヤーの切り替え
             state.game.currentPlayer = state.game.currentPlayer === 'Black' ? 'White' : 'Black';
         },
@@ -306,7 +241,7 @@ export const chessStore = {
         performMove({ commit }, { from, to }) {
             commit('movePiece', { from, to });
             commit('clearPossibleMoves');
-            commit('clearFrom')
+            commit('clearFrom');
         },
     },
       

@@ -18,8 +18,8 @@ export default {
     }),
   },
   methods: {
-    ...mapActions(['getNextMove']),
-    
+    ...mapActions('reversiStore', ['getNextMove']),
+        
     askAINextMove() {
       // VuexストアのgetNextMoveアクションをディスパッチする
       this.getNextMove();
