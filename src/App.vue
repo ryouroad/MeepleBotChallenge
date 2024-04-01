@@ -6,10 +6,10 @@
       <nav>
         <ul>
           <li><a :href="`${baseUrl}`">ホーム</a></li>
-          <li><a :href="`${baseUrl}#boardgame`">ミープルボットとのゲーム</a></li>
-          <li><a :href="`${baseUrl}#meeplebot`">ミープルボット紹介</a></li>
-          <li><a :href="`${baseUrl}#articles`">記事一覧</a></li>
-          <li><a :href="`${baseUrl}#contact`">お問い合わせ</a></li>
+          <li><router-link to="/" @click.prevent="scrollToId('boardgame')">ミープルボットとのゲーム</router-link></li>
+          <li><router-link to="/" @click.prevent="scrollToId('meeplebot')">ミープルボット紹介</router-link></li>
+          <li><router-link to="/" @click.prevent="scrollToId('articles')">記事一覧</router-link></li>
+          <li><router-link to="/" @click.prevent="scrollToId('contact')">お問い合わせ</router-link></li>
         </ul>
       </nav>
     </header>
@@ -49,7 +49,7 @@
             </div>
             <div class="articles-container">
               <div v-for="article in filteredArticles" :key="article.id" class="article-item">
-                <router-link :to="`/article/${article.id}`">
+                <router-link :to="`#${article.id}`">
                   <img :src="article.imageUrl" :alt="article.title" class="article-image">
                   <h3>{{ article.title }}</h3>
                 </router-link>
@@ -84,6 +84,9 @@ import { useStore } from 'vuex';
 
 export default {
   name: 'App',
+  mounted() {
+    document.title = 'ミープルボットの挑戦';
+  },
   data() {
     const store = useStore();
     const articles = computed(() => store.state.articleStore.articles);
@@ -115,6 +118,12 @@ export default {
   methods: {
     filterByTag(tag) {
       this.selectedTag = tag;
+    },
+    scrollToId(id) {
+    const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   }
 }

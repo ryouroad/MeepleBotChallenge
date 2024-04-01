@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import App from '@/App.vue'
 import ArticleViewer from '@/components/Article/ArticleViewer.vue';
 import ReversiViewer from '@/components/Reversi/ReversiViewer.vue';
@@ -9,13 +9,6 @@ const routes = [
     path: '/',
     name: 'Top',
     component: App
-  },
-  {
-    path: '/article/:id',
-    name: 'Article',
-    components: {
-      Main: ArticleViewer
-    },
   },
   {
     path: '/reversi',
@@ -30,12 +23,28 @@ const routes = [
     components: {
       Main: ChessViewer
     },
-  }
+  },
+  {
+    path: '/:id',
+    name: 'Article',
+    components: {
+      Main: ArticleViewer
+    },
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(process.env.BASE_URL),
   routes,
+  scrollBehavior(to) {
+    if (to.hash) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ selector: to.hash });
+        }, 500); // 500ミリ秒後にハッシュへスクロール
+      });
+    }
+  },
 });
 
 export default router;
