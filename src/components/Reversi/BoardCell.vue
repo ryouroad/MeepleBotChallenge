@@ -1,6 +1,6 @@
 <!-- Cell.vue -->
 <template>
-  <div class="cell" @click="$emit('click')">
+  <div class="cell">
     <div v-if="state === 'black'" class="disk black"></div>
     <div v-if="state === 'white'" class="disk white"></div>
   </div>

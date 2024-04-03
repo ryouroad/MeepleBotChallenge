@@ -10,7 +10,6 @@
 import { mapState } from 'vuex';
 
 export default {
-    props: ['board'],
     computed: {
         ...mapState({
             board: state => state.reversiStore.game.board,

@@ -17,7 +17,9 @@ export default {
         return { input: '' }
     },
     computed: {
-        ...mapState(['reversiStore/isFeedbackLoading']),
+        ...mapState({
+            isFeedbackLoading: state => state.reversiStore.isFeedbackLoading,
+        }),
     },
     methods: {
         send() {

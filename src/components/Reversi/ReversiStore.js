@@ -26,7 +26,7 @@ function flipDiscs(board, x, y, color) {
             }
         }
     }
-    // console.log("flipped:"+flipped);
+    // console.log("x:"+x+" y:"+y+" flipped:"+flipped);
     return flipped; // ひっくり返せたかどうかを返す
 }
 
@@ -172,6 +172,7 @@ export const reversiStore = {
             commit('setIsChatLoading', false); // ローディング終了
         },
         handleMove({ commit, state, dispatch }, { x, y }) {
+            // console.log('handleMove x:'+x+" y:"+y);
             const color = state.game.currentPlayer;
             if (!isValidMove(state.game.board, x, y, color)) {
                 console.error("Invalid move");

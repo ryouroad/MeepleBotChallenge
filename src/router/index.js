@@ -3,6 +3,7 @@ import App from '@/App.vue'
 import ArticleViewer from '@/components/Article/ArticleViewer.vue';
 import ReversiViewer from '@/components/Reversi/ReversiViewer.vue';
 import ChessViewer from '@/components/Chess/ChessViewer.vue';
+import { trackRouter } from "vue-gtag-next";
 
 const routes = [
   {
@@ -46,5 +47,5 @@ const router = createRouter({
     }
   },
 });
-
+trackRouter(router);
 export default router;
