@@ -28,10 +28,10 @@
           
           <section id="meeplebot">
             <h2>ミープルボット紹介（キャライメージ）</h2>
-            <img src=./assets/MeepleBotFriend.webp alt="ミープルボットの画像">
-            <img src=./assets/MeepleBotBoardGame.jpg alt="ミープルボットの画像">
-            <img src=./assets/MeepleBotGPTCore.webp alt="ミープルボットの画像">
-            <img src=./assets/MeepleBotStrategy.webp alt="ミープルボットの画像">
+            <img src=./assets/MeepleBot/MeepleBotFriend.webp alt="ミープルボットの画像">
+            <img src=./assets/MeepleBot/MeepleBotBoardGame.jpg alt="ミープルボットの画像">
+            <img src=./assets/MeepleBot/MeepleBotGPTCore.webp alt="ミープルボットの画像">
+            <img src=./assets/MeepleBot/MeepleBotStrategy.webp alt="ミープルボットの画像">
             <p>ミープルボットは、GPT（Generative Pre-trained Transformer）をメインロジックとして動作する愛らしいロボットキャラクターです。彼らの設計は、親しみやすさと機能性を兼ね備えており、ユーザーとの相互作用を重視しています。</p>
             <p>このミープルボットはただのキャラクターではなく、GPTをメインロジックとして活用して、ユーザーとの相互作用を豊かにします。特にボードゲームに関して強い関心を持ち、その知識と技能は単にゲームを楽しむだけでなく、学習と進化も含まれています。ミープルボットは様々なボードゲームのルールを覚え、ゲーム戦略に関するアドバイスを提供することができます。さらに、対戦相手としても機能し、ユーザーに挑戦的かつ教育的なゲーム体験を提供します。</p>
             <p>ミープルボットには多様性があり、それぞれが異なるボードゲームに特化している場合があります。この多様性により、ユーザーは自分の興味やスキルレベルに応じて最適なミープルボットを見つけ、ゲームを通じて学習や楽しみを深めることができます。ミープルボットは単なるゲームパートナーではなく、学習を促進し、戦略的思考を養うためのインテリジェントなロボットとして設計されています。</p>
@@ -49,7 +49,7 @@
             </div>
             <div class="articles-container">
               <div v-for="article in filteredArticles" :key="article.id" class="article-item">
-                <router-link :to="`#${article.id}`">
+                <router-link :to="`${article.id}`">
                   <img :src="article.imageUrl" :alt="article.title" class="article-image">
                   <h3>{{ article.title }}</h3>
                 </router-link>

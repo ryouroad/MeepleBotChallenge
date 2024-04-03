@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import meepleBotImage from '@/assets/MeepleBotBoardGame.jpg';
+import meepleBotImage from '@/assets/MeepleBot/MeepleBotBoardGame.jpg';
 </script>
 
 
