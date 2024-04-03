@@ -1,6 +1,6 @@
-// import axios from 'axios'
-// const API_KEY = process.env.VUE_APP_API_KEY;
-// const SERVER_URL = process.env.VUE_APP_SERVER_URL;
+import axios from 'axios'
+const API_KEY = process.env.VUE_APP_API_KEY;
+const SERVER_URL = process.env.VUE_APP_SERVER_URL;
 
 export const chessStore = {
     namespaced: true,
@@ -285,9 +285,6 @@ export const chessStore = {
                 }
             });
         },
-    },
-      
-        /*
         async sendFeedback({ commit }, message) {
             commit('setIsFeedbackLoading', true); // ローディング開始
             const post_response = await axios.post(SERVER_URL+'feedback', {
@@ -300,11 +297,12 @@ export const chessStore = {
             console.log(post_response)
             commit('setIsFeedbackLoading', false); // ローディング終了
         },
+        /*
         async sendMessage({ commit, state }, message) {
             commit('setIsChatLoading', true); // ローディング開始
             commit('addMessage', { text: message, sender: 'user' })
             const validMoves = calculateValidMoves(state.game.board, state.game.currentPlayer);
-            const post_response = await axios.post(SERVER_URL+'reversi/chat', {
+            const post_response = await axios.post(SERVER_URL+'chess/chat', {
                 board: state.game.board,
                 currentPlayer: state.game.currentPlayer,
                 validMoves: validMoves,
@@ -317,7 +315,7 @@ export const chessStore = {
             });
             if(post_response.status===200){
                 // console.log(post_response)
-                var response = await axios.get(SERVER_URL+'reversi/chat', {
+                var response = await axios.get(SERVER_URL+'chess/chat', {
                     headers: {
                         'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
                         'x-thread-id': post_response.data.threadId,
@@ -325,7 +323,7 @@ export const chessStore = {
                     }
                 });
                 while (response.status!=200){
-                    response = await axios.get(SERVER_URL+'reversi/chat', {
+                    response = await axios.get(SERVER_URL+'chess/chat', {
                         headers: {
                             'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
                             'x-thread-id': post_response.data.threadId,
@@ -338,51 +336,6 @@ export const chessStore = {
             commit('setThreadId', response.data.threadId);
             commit('addMessage', { text: response.data.text, sender: 'ai' })
             commit('setIsChatLoading', false); // ローディング終了
-        },*/
-        /*handleMove({ commit, state, dispatch }, { x, y }) {
-            const color = state.game.currentPlayer;
-            if (!isValidMove(state.game.board, x, y, color)) {
-                // console.error("Invalid move");
-                return;
-            }
-            commit('setBoard', { x, y, color });
-            if (flipDiscs(state.game.board, x, y, color)) {
-                commit('switchPlayer');
-                // ターンを変えた後のプレイヤーが合法手を持っているかチェック
-                if (!hasValidMove(state.game.board, state.game.currentPlayer)) {
-                    // 次のプレイヤーが合法手を持っていない場合、もう一度プレイヤーを切り替え
-                    commit('switchPlayer');
-                    if (!hasValidMove(state.game.board, state.game.currentPlayer)) {
-                        // どちらのプレイヤーも合法手を持っていない場合、ゲーム終了
-                        dispatch('endGame');
-                    }
-                }
-            } else {
-                console.error("No discs flipped");
-            }
-        },*/
-        /*endGame({ state, commit }) {
-            let blackCount = 0;
-            let whiteCount = 0;
-            // 盤面をスキャンして、それぞれの石の数をカウント
-            state.game.board.forEach(row => {
-                row.forEach(cell => {
-                    if (cell === 'black') blackCount++;
-                    if (cell === 'white') whiteCount++;
-                });
-            });
-    
-            // 勝者を決定
-            let winner = null;
-            if (blackCount > whiteCount) {
-                winner = 'black';
-            } else if (whiteCount > blackCount) {
-                winner = 'white';
-            } // それ以外の場合は引き分け（winnerはnullのまま）
-    
-            // 結果を保存
-            commit('setWinner', winner);
-            commit('setGameOver', true);
         },
         async getNextMove({ commit, state, dispatch }) {
             const validMoves = calculateValidMoves(state.game.board, state.game.currentPlayer);
@@ -398,7 +351,7 @@ export const chessStore = {
             }
             commit('setIsNextMoveLoading', true); // ローディング開始
             try {
-                const post_response = await axios.post(SERVER_URL+'reversi/move', {
+                const post_response = await axios.post(SERVER_URL+'chess/move', {
                     board: state.game.board,
                     currentPlayer: state.game.currentPlayer,
                     validMoves: validMoves, // ここに合法手を追加
@@ -409,7 +362,7 @@ export const chessStore = {
                 });
                 if(post_response.status===200){
                     // console.log(post_response)
-                    var response = await axios.get(SERVER_URL+'reversi/move', {
+                    var response = await axios.get(SERVER_URL+'chess/move', {
                         headers: {
                           'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
                           'x-thread-id': post_response.data.threadId,
@@ -417,7 +370,7 @@ export const chessStore = {
                         }
                     });
                     while (response.status!=200){
-                        response = await axios.get(SERVER_URL+'reversi/move', {
+                        response = await axios.get(SERVER_URL+'chess/move', {
                             headers: {
                                 'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
                                 'x-thread-id': post_response.data.threadId,
@@ -427,23 +380,12 @@ export const chessStore = {
                     }
                 }
                 // APIから次の手の情報を受け取る
-                const { x, y } = response.data;
-            
-                // 受け取った手をゲーム状態に適用する
-                if (typeof x === 'number' && typeof y === 'number' && x != -1 && y != -1) {
-                    // 石を置く処理を実行
-                    commit('setBoard', { x, y, color: state.game.currentPlayer });
-                    // 石をひっくり返す処理を実行
-                    flipDiscs(state.game.board, x, y, state.game.currentPlayer);
-                    // プレイヤーを切り替える
-                    commit('switchPlayer');
-                } else {
-                    console.error('Invalid move received from backend');
-                }
+                // const { x, y } = response.data;
+        
             } catch (error) {
               console.error('Error fetching next move:', error);
             }
             commit('setIsNextMoveLoading', false); // ローディング終了
-        },        
-    },*/
+        }, */       
+    },
 }

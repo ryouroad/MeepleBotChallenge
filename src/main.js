@@ -9,7 +9,7 @@ const app = createApp(App)
 
 app.use(VueGtag, {
   property: {
-    id: process.env.VUE_APP_GTAG_ID, // ここにGoogle Analyticsの測定IDを設定
+    id: process.env.VUE_APP_GTAG_ID, 
   },
-  useDebugger: process.env.NODE_ENV != 'production',
+  useDebugger: process.env.NODE_ENV !== 'production',
 }).use(store).use(router).mount('#app')
