@@ -1,6 +1,6 @@
 <template>
     <div class="promotion-dialog">
-        <p>他の操作をする前に、{{currentPlayer}}のポーンからプロモーションする駒を選択してください。</p>
+        <p>他の操作をする前に、ポーンからプロモーションする駒を選択してください。</p>
         <div class="promotion-option" @click="select('Queen')">クイーン</div>
         <div class="promotion-option" @click="select('Rook')">ルーク</div>
         <div class="promotion-option" @click="select('Bishop')">ビショップ</div>
