@@ -24,6 +24,8 @@ export const chessStore = {
             currentPlayer: 'White',
             from: null,
             possibleMoves: null,
+            showPromotionDialog: false,
+            promotionPosition: null,
         },
         chat: {
             messages: [],
@@ -95,14 +97,30 @@ export const chessStore = {
         },
         
         clearPossibleMoves(state) {
-            // 全てのマスのisPossibleMoveをFalseにリセット
             state.game.board = state.game.board.map(row => 
                 row.map(cell => ({ ...cell, isPossibleMove: false }))
             );
             state.game.possibleMoves = null
         },
+
+        promotePawn(state, { position, newType }) {
+            // console.log("promotePawn" + position.x + position.y + newType);
+            const { x, y } = position;
+            state.game.board[y][x].type = newType;
+        },
+
+        setPromotionPosition(state, position) {
+            state.game.promotionPosition = position;
+        },
+        updateShowPromotionDialog(state, value) {
+            state.game.showPromotionDialog = value;
+        },
     },
     actions: {
+        showPromotionDialog({ commit }, { position }) {
+            commit('setPromotionPosition', position);
+            commit('updateShowPromotionDialog', true);
+        },
         calculatePossibleMoves({ commit, state }, { piece, position }) {
             // 移動可能なマスを格納する配列
             let possibleMoves = [];
@@ -238,11 +256,21 @@ export const chessStore = {
             return possibleMoves
         },
         // ピースを移動させるアクション
-        performMove({ dispatch, commit }, { from, to }) {
-            commit('movePiece', { from, to });
-            dispatch('checkForEndGame');
-            commit('clearPossibleMoves');
-            commit('clearFrom');
+        performMove({ dispatch, commit, state }, { from, to }) {
+            if(state.game.showPromotionDialog === false){    
+                commit('movePiece', { from, to });
+                // プロモーションの検出
+                const piece = state.game.board[to.y][to.x];
+                if (piece.type === 'Pawn' && (to.y === 0 || to.y === 7)) {
+                    // console.log("Promotion");
+                    // プロモーション処理のためのフラグを立てる、またはプロモーションUIを表示
+                    // ここで、プロモーションUIを表示するロジックを追加します
+                    dispatch('showPromotionDialog', { position: to });
+                }
+                dispatch('checkForEndGame');
+                commit('clearPossibleMoves');
+                commit('clearFrom');
+            }
         },
         checkForEndGame({ dispatch, state, commit }) {
             // キングの存在確認

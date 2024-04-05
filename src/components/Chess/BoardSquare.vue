@@ -28,19 +28,19 @@ const squareClass = computed(() => {
 });
 
 const squareClicked = () => {
-    console.log(`Square clicked: ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
+    // console.log(`Square clicked: ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
     if(store.state.chessStore.game.winner != null) return;
     // 移動元を選択済の場合
     if(store.state.chessStore.game.from != null){
         // 動ければ移動先にコマを移動する
-        console.log(`from != null : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
-        console.log(store.state.chessStore.game.from);
+        // console.log(`from != null : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
+        // console.log(store.state.chessStore.game.from);
         if(store.state.chessStore.game.from.x === props.position.x & store.state.chessStore.game.from.y === props.position.y){
-            console.log(`clearPossibleMoves : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
+            // console.log(`clearPossibleMoves : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
             store.commit('chessStore/clearPossibleMoves')
             store.commit('chessStore/clearFrom')
         }else if(props.isPossibleMove){
-            console.log(`performMove : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
+            // console.log(`performMove : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
             store.dispatch('chessStore/performMove', {
                 from: store.state.chessStore.game.from,
                 to: props.position,
@@ -50,7 +50,7 @@ const squareClicked = () => {
     // 移動元を未選択の場合
     }else{
         // console.log()
-        console.log(`from === null : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
+        // console.log(`from === null : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
         // 特定のピースとその位置に基づいて可能な移動先を計算する
         store.dispatch('chessStore/calculatePossibleMoves', {
             piece: props.piece, // 例えば白のポーン
