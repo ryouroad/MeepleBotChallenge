@@ -26,6 +26,7 @@ export const chessStore = {
             possibleMoves: null,
             showPromotionDialog: false,
             promotionPosition: null,
+            lastMove: null,
         },
         chat: {
             messages: [],
@@ -68,6 +69,11 @@ export const chessStore = {
         // ピースを移動させる
         movePiece(state, { from, to }) {
             const piece = state.game.board[from.y][from.x];
+            state.game.lastMove = {
+                from,
+                to,
+                piece: Object.assign({}, piece),
+            };
             state.game.board[to.y][to.x] = Object.assign({}, piece);
             state.game.board[from.y][from.x].type = null;
             state.game.board[from.y][from.x].color = null;
@@ -147,6 +153,17 @@ export const chessStore = {
                             possibleMoves.push({ x: x + dx, y: y + direction });
                         }
                     });
+
+                    // アンパサン
+                    const enemyMove = state.game.lastMove;
+                    // console.log(enemyMove)
+                    if (enemyMove !== null){
+                        if (enemyMove.piece.type === 'Pawn' && Math.abs(enemyMove.from.y - enemyMove.to.y) === 2
+                            && Math.abs(enemyMove.to.x - x) === 1 && enemyMove.to.y === y) {
+                            const direction = piece.color === 'White' ? -1 : 1;
+                            possibleMoves.push({ x: enemyMove.to.x, y: enemyMove.to.y + direction });
+                        }
+                    }
                 }
                 if (piece.type === 'Rook' | piece.type === 'Queen') {
                     const { x, y } = position;
@@ -258,9 +275,16 @@ export const chessStore = {
         // ピースを移動させるアクション
         performMove({ dispatch, commit, state }, { from, to }) {
             if(state.game.showPromotionDialog === false){    
+                const piece = state.game.board[from.y][from.x];
+                // アンパサンによる取り除きの処理
+                console.log(piece,from,to,state.game.board[from.y][to.x])
+                if (piece.type === 'Pawn' && Math.abs(from.y - to.y) === 1 && Math.abs(from.x - to.x) === 1
+                && state.game.board[to.y][to.x].type === null && state.game.board[from.y][to.x].type === 'Pawn' && state.game.board[from.y][to.x].color !== state.game.currentPlayer ) {
+                    state.game.board[from.y][to.x].type = null;
+                    state.game.board[from.y][to.x].color = null;
+                }
                 commit('movePiece', { from, to });
                 // プロモーションの検出
-                const piece = state.game.board[to.y][to.x];
                 if (piece.type === 'Pawn' && (to.y === 0 || to.y === 7)) {
                     // console.log("Promotion");
                     // プロモーション処理のためのフラグを立てる、またはプロモーションUIを表示
