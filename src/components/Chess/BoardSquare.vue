@@ -52,7 +52,8 @@ const squareClicked = () => {
         // console.log()
         // console.log(`from === null : ${props.position.x}, ${props.position.y}, ${props.piece?.type}, ${props.piece?.color}, `);
         // 特定のピースとその位置に基づいて可能な移動先を計算する
-        store.dispatch('chessStore/calculatePossibleMoves', {
+        store.dispatch('chessStore/checkSafeMoves', {
+            currentPlayer: store.state.chessStore.game.currentPlayer,
             piece: props.piece, // 例えば白のポーン
             position: props.position // ピースの現在位置
         });

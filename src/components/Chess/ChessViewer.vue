@@ -21,7 +21,7 @@ export default {
   methods: {
     ...mapActions(['sendMessage', 'sendFeedback']),
     handlePromotionSelect({ pieceType }) {
-      console.log("handlePromotionSelect:"+pieceType+this.game.promotionPosition.x+this.game.promotionPosition.y);
+      // console.log("handlePromotionSelect:"+pieceType+this.game.promotionPosition.x+this.game.promotionPosition.y);
       this.$store.commit('chessStore/promotePawn', { position: this.game.promotionPosition, newType: pieceType });
       this.$store.commit('chessStore/updateShowPromotionDialog', false);
     },
