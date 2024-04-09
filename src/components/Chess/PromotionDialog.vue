@@ -22,8 +22,6 @@ export default {
 
 <style scoped>
 .promotion-option {
-    /* スタイル設定 */
     cursor: pointer;
 }
 </style>
-  

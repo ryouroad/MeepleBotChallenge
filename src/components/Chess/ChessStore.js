@@ -404,6 +404,37 @@ export const chessStore = {
                 commit('clearFrom');
             }
         },
+        async checkAllSafeMoves({ state, dispatch, commit }) {
+            let movePromises = [];
+    
+            // console.log("currentPlayer:",state.game.currentPlayer);
+            // 盤上の各ピースに対して可能な移動を計算
+            state.game.board.forEach((row, y) => {
+                row.forEach((cell, x) => {
+                    // console.log("from else:",x,y,cell.color,state.game.currentPlayer,cell.color===state.game.currentPlayer);
+                    if (cell.color === state.game.currentPlayer) {
+                        // 各駒に対して安全な移動をチェックするPromiseを生成
+                        const from = { x, y }; // 移動元
+                        // console.log("from:",from);
+                        const movePromise = dispatch('checkSafeMoves', { currentPlayer:state.game.currentPlayer, piece: cell, position: from })
+                            .then(moves => {
+                                // 各移動先に対して{ from, to }の形式でオブジェクトを生成
+                                return moves.map(to => ({ from, to }));
+                            });
+                        movePromises.push(movePromise);
+                    }
+                });
+            });
+    
+            // Promise.allを使用して全てのプロミスが解決されるのを待ち、
+            // 結果を平坦化して単一の配列にする
+            const results = await Promise.all(movePromises);
+            const flatResults = results.flat(); // 結果を平坦化
+            // console.log(flatResults);
+            commit('clearPossibleMoves');
+            commit('clearFrom');
+            return flatResults; // [{ from: {x, y}, to: {x, y} }, ...] 形式で返す
+        },
         checkForEndGame({ dispatch, state, commit }) {
             // 白と黒の合法手を計算するためのPromise配列
             let whiteMovesPromises = [];
@@ -460,11 +491,10 @@ export const chessStore = {
             console.log(post_response)
             commit('setIsFeedbackLoading', false); // ローディング終了
         },
-        /*
-        async sendMessage({ commit, state }, message) {
+        async sendMessage({ dispatch, commit, state }, message) {
             commit('setIsChatLoading', true); // ローディング開始
             commit('addMessage', { text: message, sender: 'user' })
-            const validMoves = calculateValidMoves(state.game.board, state.game.currentPlayer);
+            const validMoves = await dispatch('checkAllSafeMoves');
             const post_response = await axios.post(SERVER_URL+'chess/chat', {
                 board: state.game.board,
                 currentPlayer: state.game.currentPlayer,
@@ -501,17 +531,7 @@ export const chessStore = {
             commit('setIsChatLoading', false); // ローディング終了
         },
         async getNextMove({ commit, state, dispatch }) {
-            const validMoves = calculateValidMoves(state.game.board, state.game.currentPlayer);
-            if (validMoves.length === 0) {
-                // 合法手がない場合、プレイヤーを切り替える
-                commit('switchPlayer');
-                // もう一度合法手があるかチェックし、もしなければゲーム終了
-                if (!hasValidMove(state.game.board, state.game.currentPlayer)) {
-                    dispatch('endGame');
-                    return; // ゲーム終了なのでここで処理を終了
-                }
-                // プレイヤーを切り替えた後、合法手がある場合は処理を続ける
-            }
+            const validMoves = await dispatch('checkAllSafeMoves');
             commit('setIsNextMoveLoading', true); // ローディング開始
             try {
                 const post_response = await axios.post(SERVER_URL+'chess/move', {
@@ -543,12 +563,14 @@ export const chessStore = {
                     }
                 }
                 // APIから次の手の情報を受け取る
-                // const { x, y } = response.data;
-        
+                const { from, to } = response.data;
+                if(state.game.board[from.y][from.x].color === state.game.currentPlayer){
+                    dispatch('performMove',{from, to});
+                }
             } catch (error) {
               console.error('Error fetching next move:', error);
             }
             commit('setIsNextMoveLoading', false); // ローディング終了
-        }, */       
+        },      
     },
 }
