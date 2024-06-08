@@ -6,6 +6,8 @@
       <nav>
         <ul>
           <li><a :href="`${baseUrl}`">ホーム</a></li>
+          <li v-if="!getName"><a :href="`${loginUrl}`">ログイン</a></li>
+          <li v-else ><a :href="`${logoutUrl}`">ログアウト</a></li>
           <li><router-link to="/" @click.prevent="scrollToId('boardgame')">ミープルボットとのゲーム</router-link></li>
           <li><router-link to="/" @click.prevent="scrollToId('meeplebot')">ミープルボット紹介</router-link></li>
           <li><router-link to="/" @click.prevent="scrollToId('articles')">記事一覧</router-link></li>
@@ -15,6 +17,7 @@
     </header>
     
     <main>
+      <p v-if="getName">ようこそ{{getName}}さん！一緒に楽しみましょう！</p>
       <router-view name="Main" v-slot="{ Component }">
         <!-- Componentが存在する場合、動的にそのコンポーネントをレンダリング -->
         <component :is="Component" />
@@ -80,12 +83,17 @@
   
 <script>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useStore, mapGetters } from 'vuex';
+import axios from 'axios';
+const CLIENT_ID = process.env.VUE_APP_COGNITO_CLIENT_ID;
+const COGNITO_URL = process.env.VUE_APP_COGNITO_URL;
+const REDIRECT_URI = process.env.VUE_APP_BASE_URL;
 
 export default {
   name: 'App',
   mounted() {
     document.title = 'ミープルボットの挑戦';
+    this.handleLogin();
   },
   data() {
     const store = useStore();
@@ -94,6 +102,8 @@ export default {
       articles,
       selectedTag: null,
       baseUrl: process.env.BASE_URL,
+      loginUrl: COGNITO_URL+'/oauth2/authorize?response_type=code&client_id='+CLIENT_ID+'&redirect_uri='+REDIRECT_URI,
+      logoutUrl: COGNITO_URL+'/logout?response_type=code&client_id='+CLIENT_ID+'&redirect_uri='+REDIRECT_URI,
     };
   },
   computed: {
@@ -113,7 +123,10 @@ export default {
       return Object.values(this.articles).filter(article =>
         article.tags.includes(this.selectedTag)
       );
-    }
+    },
+    ...mapGetters([
+      'getName'
+    ])
   },
   methods: {
     filterByTag(tag) {
@@ -123,6 +136,42 @@ export default {
     const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    handleLogin() {
+      // URLのクエリパラメータから認証コードを取得
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+
+      if (code) {
+        // 認証コードを使用してトークンを取得
+        // console.log('Code:', code);
+        this.getToken(code);
+      } else {
+        console.error('Authorization code not found in URL');
+      }
+    },
+    async getToken(code) {
+      const clientId = CLIENT_ID;
+      const redirectUri = REDIRECT_URI;
+      const store = useStore();
+      
+      try {
+        const response = await axios.post(COGNITO_URL+'/oauth2/token', new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: redirectUri,
+          client_id: clientId,
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+
+        // console.log('Token Response:', response.data);
+        store.dispatch('saveToken', response.data);
+      } catch (error) {
+        console.error('Error fetching token:', error);
       }
     }
   }
