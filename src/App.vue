@@ -6,8 +6,8 @@
       <nav>
         <ul>
           <li><a :href="`${baseUrl}`">ホーム</a></li>
-          <li v-if="!getName"><a :href="`${loginUrl}`">ログイン</a></li>
-          <li v-else ><a :href="`${logoutUrl}`">ログアウト</a></li>
+          <li v-if="!getUserName"><a :href="`${loginUrl}`">ログイン</a></li>
+          <li v-else ><a :href="`${logoutUrl}`" @click="removeToken">ログアウト</a></li>
           <li><router-link to="/" @click.prevent="scrollToId('boardgame')">ミープルボットとのゲーム</router-link></li>
           <li><router-link to="/" @click.prevent="scrollToId('meeplebot')">ミープルボット紹介</router-link></li>
           <li><router-link to="/" @click.prevent="scrollToId('articles')">記事一覧</router-link></li>
@@ -17,7 +17,7 @@
     </header>
     
     <main>
-      <p v-if="getName">ようこそ{{getName}}さん！一緒に楽しみましょう！</p>
+      <p v-if="getUserName">ようこそ{{getUserName}}さん！一緒に楽しみましょう！</p>
       <router-view name="Main" v-slot="{ Component }">
         <!-- Componentが存在する場合、動的にそのコンポーネントをレンダリング -->
         <component :is="Component" />
@@ -124,10 +124,10 @@ export default {
         article.tags.includes(this.selectedTag)
       );
     },
-    ...mapGetters([
-      'getName'
-    ])
-  },
+    ...mapGetters({
+      getUserName: 'authStore/getName'
+    })
+    },
   methods: {
     filterByTag(tag) {
       this.selectedTag = tag;
@@ -169,11 +169,15 @@ export default {
         });
 
         // console.log('Token Response:', response.data);
-        store.dispatch('saveToken', response.data);
+        store.dispatch('authStore/saveToken', response.data);
       } catch (error) {
         console.error('Error fetching token:', error);
       }
-    }
+    },
+    removeToken(){
+      const store = useStore();
+      store.dispatch('authStore/removeToken');
+    },
   }
 }
 </script>
