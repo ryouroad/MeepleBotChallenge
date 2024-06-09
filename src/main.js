@@ -10,6 +10,9 @@ const app = createApp(App)
 app.use(VueGtag, {
   property: {
     id: process.env.VUE_APP_GTAG_ID, 
+    params:{
+      user_id: null,
+    }
   },
   useDebugger: process.env.NODE_ENV !== 'production',
 }).use(store).use(router).mount('#app')

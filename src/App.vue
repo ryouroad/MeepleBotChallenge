@@ -7,7 +7,7 @@
         <ul>
           <li><a :href="`${baseUrl}`">ホーム</a></li>
           <li v-if="!getUserName"><a :href="`${loginUrl}`">ログイン</a></li>
-          <li v-else ><a :href="`${logoutUrl}`" @click="removeToken">ログアウト</a></li>
+          <li v-else ><a :href="`${logoutUrl}`" target="_blank" @click="removeToken">ログアウト</a></li>
           <li><router-link to="/" @click.prevent="scrollToId('boardgame')">ミープルボットとのゲーム</router-link></li>
           <li><router-link to="/" @click.prevent="scrollToId('meeplebot')">ミープルボット紹介</router-link></li>
           <li><router-link to="/" @click.prevent="scrollToId('articles')">記事一覧</router-link></li>
@@ -24,9 +24,11 @@
         <!-- Componentが存在しない場合、代替テキストを表示 -->
         <div v-if="!Component">
           <section id="boardgame">
-            <h2>ミープルボットとのゲーム</h2>
+            <h2>ミープルボット（AI）とのゲーム</h2>
             <li><router-link :to="`/reversi`">リバーシ</router-link></li>
             <li><router-link :to="`/chess`">チェス</router-link></li>
+            <h2>オリジナルゲーム（対人戦）</h2>
+            <li><router-link :to="`/buildersTactics`">ビルダーズタクティクス</router-link></li>
           </section>
           
           <section id="meeplebot">
@@ -80,10 +82,11 @@
     </footer>
   </div>
 </template>
-  
+
+
 <script>
-import { computed } from 'vue';
-import { useStore, mapGetters } from 'vuex';
+import { useStore } from 'vuex';
+import { computed, onMounted, ref } from 'vue';
 import axios from 'axios';
 const CLIENT_ID = process.env.VUE_APP_COGNITO_CLIENT_ID;
 const COGNITO_URL = process.env.VUE_APP_COGNITO_URL;
@@ -91,95 +94,105 @@ const REDIRECT_URI = process.env.VUE_APP_BASE_URL;
 
 export default {
   name: 'App',
-  mounted() {
-    document.title = 'ミープルボットの挑戦';
-    this.handleLogin();
-  },
-  data() {
+  setup() {
     const store = useStore();
+
+    // リアクティブなデータ
     const articles = computed(() => store.state.articleStore.articles);
-    return { 
-      articles,
-      selectedTag: null,
-      baseUrl: process.env.BASE_URL,
-      loginUrl: COGNITO_URL+'/oauth2/authorize?response_type=code&client_id='+CLIENT_ID+'&redirect_uri='+REDIRECT_URI,
-      logoutUrl: COGNITO_URL+'/logout?response_type=code&client_id='+CLIENT_ID+'&redirect_uri='+REDIRECT_URI,
-    };
-  },
-  computed: {
-    availableTags() {
-      // 利用可能な全タグのリストを生成
+    const selectedTag = ref(null);
+
+    // computed properties
+    const availableTags = computed(() => {
       const tags = new Set();
-      Object.values(this.articles).forEach(article => {
+      Object.values(articles.value).forEach(article => {
         article.tags.forEach(tag => tags.add(tag));
       });
       return Array.from(tags);
-    },
-    filteredArticles() {
-      // 選択されたタグに基づいて記事をフィルタリング
-      if (!this.selectedTag) {
-        return Object.values(this.articles);
+    });
+
+    const filteredArticles = computed(() => {
+      if (!selectedTag.value) {
+        return Object.values(articles.value);
       }
-      return Object.values(this.articles).filter(article =>
-        article.tags.includes(this.selectedTag)
+      return Object.values(articles.value).filter(article =>
+        article.tags.includes(selectedTag.value)
       );
-    },
-    ...mapGetters({
-      getUserName: 'authStore/getName'
-    })
-    },
-  methods: {
-    filterByTag(tag) {
-      this.selectedTag = tag;
-    },
-    scrollToId(id) {
-    const element = document.getElementById(id);
+    });
+
+    const getUserName = computed(() => store.getters['authStore/getName']);
+
+    const baseUrl = process.env.BASE_URL;
+    const loginUrl = `${COGNITO_URL}/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
+    const logoutUrl = `${COGNITO_URL}/logout?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
+
+    // methods
+    const filterByTag = tag => {
+      selectedTag.value = tag;
+    };
+
+    const scrollToId = id => {
+      const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
-    },
-    handleLogin() {
-      // URLのクエリパラメータから認証コードを取得
+    };
+
+    const handleLogin = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
 
       if (code) {
-        // 認証コードを使用してトークンを取得
-        // console.log('Code:', code);
-        this.getToken(code);
+        getToken(code);
       } else {
         console.error('Authorization code not found in URL');
       }
-    },
-    async getToken(code) {
-      const clientId = CLIENT_ID;
-      const redirectUri = REDIRECT_URI;
-      const store = useStore();
-      
+    };
+
+    const getToken = async code => {
       try {
-        const response = await axios.post(COGNITO_URL+'/oauth2/token', new URLSearchParams({
+        const response = await axios.post(`${COGNITO_URL}/oauth2/token`, new URLSearchParams({
           grant_type: 'authorization_code',
           code: code,
-          redirect_uri: redirectUri,
-          client_id: clientId,
+          redirect_uri: REDIRECT_URI,
+          client_id: CLIENT_ID,
         }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         });
 
-        // console.log('Token Response:', response.data);
         store.dispatch('authStore/saveToken', response.data);
       } catch (error) {
         console.error('Error fetching token:', error);
       }
-    },
-    removeToken(){
-      const store = useStore();
+    };
+
+    const removeToken = () => {
+      // console.log("トークンを削除します");
       store.dispatch('authStore/removeToken');
-    },
+    };
+
+    // onMounted hook
+    onMounted(() => {
+      document.title = 'ミープルボットの挑戦';
+      handleLogin();
+    });
+
+    return {
+      articles,
+      selectedTag,
+      availableTags,
+      filteredArticles,
+      getUserName,
+      baseUrl,
+      loginUrl,
+      logoutUrl,
+      filterByTag,
+      scrollToId,
+      removeToken,
+    };
   }
-}
+};
 </script>
 
 <style scoped>

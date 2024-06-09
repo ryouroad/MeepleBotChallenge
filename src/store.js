@@ -3,63 +3,52 @@ import { articleStore } from './components/Article/ArticleStore';
 import { reversiStore } from './components/Reversi/ReversiStore';
 import { chessStore } from './components/Chess/ChessStore';
 import VueJwtDecode from 'vue-jwt-decode';
-import createPersistedState from 'vuex-persistedstate'
+import createPersistedState from 'vuex-persistedstate';
+import { enableUserTracking, disableUserTracking } from './tag.js';
 
 export const authStore = {
   namespaced: true,
-  state () {
-    return {
-      token: "",
-      name: ""
-    }
-  },
+  state: () => ({
+    token: "",
+    name: ""
+  }),
   mutations: {
-    saveToken (state,{token,name}) {
-      state.token = token
-      state.name = name
+    saveToken(state, { token, name }) {
+      state.token = token;
+      state.name = name;
+      enableUserTracking(name);
     },
-    removeToken(state){
-      state.token = ""
-      state.name = ""
+    removeToken(state) {
+      state.token = "";
+      state.name = "";
+      disableUserTracking();
     }
   },
   actions: {
-    saveToken({commit}, token) {
-      // console.log("Token object:", token);
-
-      if (token && token.id_token) {
-        const id_token = token.id_token;
-        // console.log("ID Token:", id_token);
-
+    saveToken({ commit }, token) {
+      if (token?.id_token) {
         try {
-          const payload = VueJwtDecode.decode(id_token);
-          // console.log("Decoded Payload:", payload);
+          const payload = VueJwtDecode.decode(token.id_token);
           const name = payload['cognito:username'];
-          // console.log("Name:", name);
-          commit("saveToken",{ token, name });
+          commit("saveToken", { token, name });
         } catch (error) {
-            console.error("Failed to decode token:", error);
+          console.error("Failed to decode token:", error);
         }
       } else {
         console.error("id_token is undefined. Token object:", token);
       }
-    }, 
-    removeToken({commit}){
-        commit("removeToken")
+    },
+    removeToken({ commit }) {
+      commit("removeToken");
     }
   },
   getters: {
-    getToken: state => {
-      return state.token
-    },
-    getName: state => {
-      // console.log(state.name)
-      return state.name
-    }
+    getToken: state => state.token,
+    getName: state => state.name
   }
-}
+};
 
-// Vuexストアの作成とモジュールの登録
+// Create and export the Vuex store
 export default createStore({
   modules: {
     articleStore,
@@ -68,4 +57,4 @@ export default createStore({
     authStore,
   },
   plugins: [createPersistedState()],
-})
+});
