@@ -6,7 +6,6 @@
         <v-toolbar-title>ミープルボットの挑戦</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn text :href="twitterUrl">管理者Xアカウント</v-btn>
-        <v-btn text :href="boardgamerUrl">管理者ボドゲーマアカウント</v-btn>
       </v-app-bar>
       
       <v-navigation-drawer v-model="drawer" :permanent="isLargeScreen" app>
@@ -112,7 +111,6 @@ import { useDisplay } from 'vuetify';
 const CLIENT_ID = process.env.VUE_APP_COGNITO_CLIENT_ID;
 const COGNITO_URL = process.env.VUE_APP_COGNITO_URL;
 const TWITTER_URL = process.env.VUE_APP_TWITTER_URL;
-const BOARDGAMER_URL = process.env.VUE_APP_BOARDGAMER_URL;
 const REDIRECT_URI = process.env.VUE_APP_BASE_URL;
 
 export default {
@@ -125,11 +123,8 @@ export default {
     const loginUrl = `${COGNITO_URL}/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
     const logoutUrl = `${COGNITO_URL}/logout?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
     const twitterUrl = TWITTER_URL;
-    const boardgamerUrl = BOARDGAMER_URL;
-    // const expandedPanels = ref(null);
     const { mdAndUp } = useDisplay();
     const isLargeScreen = computed(() => {
-      // console.log("isLargeScreen:", mdAndUp.value)
       return mdAndUp.value
     });
 
@@ -174,7 +169,6 @@ export default {
     };
 
     const removeToken = () => {
-      // console.log("トークンを削除します");
       store.dispatch('authStore/removeToken');
     };
 
@@ -187,7 +181,6 @@ export default {
     return {
       drawer,
       isLargeScreen,
-      // expandedPanels,
       getUserName,
       baseUrl,
       loginUrl,
