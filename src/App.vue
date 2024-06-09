@@ -186,7 +186,6 @@ export default {
       loginUrl,
       logoutUrl,
       twitterUrl,
-      boardgamerUrl,
       scrollToId,
       removeToken,
     };
