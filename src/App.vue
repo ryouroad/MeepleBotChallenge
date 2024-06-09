@@ -20,18 +20,45 @@
           <v-list-item v-else @click="removeToken" link :href="`${logoutUrl}`" target="_blank">
             <v-list-item-title>ログアウト</v-list-item-title>
           </v-list-item>
-          <v-list-item link @click.prevent="scrollToId('boardgame')">
-            <v-list-item-title>ミープルボットとのゲーム</v-list-item-title>
-          </v-list-item>
-          <v-list-item link @click.prevent="scrollToId('meeplebot')">
-            <v-list-item-title>ミープルボット紹介</v-list-item-title>
-          </v-list-item>
-          <v-list-item link @click.prevent="scrollToId('articles')">
-            <v-list-item-title>記事一覧</v-list-item-title>
-          </v-list-item>
           <v-list-item link @click="scrollToId('contact')">
             <v-list-item-title>お問い合わせ</v-list-item-title>
           </v-list-item>
+
+          <v-expansion-panels>
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                <v-list-item-title>ボードゲームAI</v-list-item-title>
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <v-list-item>
+                  <router-link :to="`/reversi`" style="text-decoration: none; color: inherit;">
+                    <v-list-item-title>リバーシ</v-list-item-title>
+                  </router-link>
+                </v-list-item>
+                <v-list-item>
+                  <router-link :to="`/chess`" style="text-decoration: none;  color: inherit;">
+                    <v-list-item-title>チェス</v-list-item-title>
+                  </router-link>
+                </v-list-item>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+
+          <v-expansion-panels>
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                <v-list-item-title>オリジナル対人ゲーム</v-list-item-title>
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <v-list-item>
+                  <router-link :to="`/buildersTactics`" style="text-decoration: none;  color: inherit;">
+                    <v-list-item-title>Builders Tactics</v-list-item-title>
+                  </router-link>
+                </v-list-item>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+
         </v-list>
       </v-navigation-drawer>
       
@@ -54,7 +81,7 @@
               </v-card-text>
               <v-card-title>目的・考え</v-card-title>
               <v-card-text>
-                <p>ボードゲームにAI技術を活用して面白いことができないか<br>という思いから2024年3月20日に筆者はこのブログを立ち上げました。</p>
+                <p>ボードゲームにAI技術を活用して面白いことができないか<br>という思いから2024年3月20日に筆者はこのサイトを立ち上げました。</p>
                 <p>面白いと思った方はなんでもいいのでメッセージいただけるとありがたいです。</p>
               </v-card-text>
               <v-card-title>お問い合わせ</v-card-title>
@@ -99,7 +126,7 @@ export default {
     const logoutUrl = `${COGNITO_URL}/logout?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
     const twitterUrl = TWITTER_URL;
     const boardgamerUrl = BOARDGAMER_URL;
-
+    // const expandedPanels = ref(null);
     const { mdAndUp } = useDisplay();
     const isLargeScreen = computed(() => {
       // console.log("isLargeScreen:", mdAndUp.value)
@@ -110,6 +137,9 @@ export default {
       const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
+      }else{
+        this.$router.push('/');
+
       }
     };
 
@@ -157,6 +187,7 @@ export default {
     return {
       drawer,
       isLargeScreen,
+      // expandedPanels,
       getUserName,
       baseUrl,
       loginUrl,

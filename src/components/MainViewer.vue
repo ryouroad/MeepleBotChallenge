@@ -35,7 +35,7 @@
                 <v-icon>mdi-hammer-wrench</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <router-link :to="`/buildersTactics`">ビルダーズタクティクス</router-link>
+                <router-link :to="`/buildersTactics`">Builders Tactics</router-link>
               </v-list-item-content>
             </v-list-item>
           </v-list>

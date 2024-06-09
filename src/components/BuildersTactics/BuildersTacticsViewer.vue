@@ -3,8 +3,8 @@
     <v-card class="pa-5" outlined max-width="1600px" width="100%">
       <v-row v-if="screen === 'menu'" id="menu-viewer" class="d-flex justify-center">
         <v-col cols="12" md="6" class="d-flex justify-center">
-          <v-btn @click="toBuilds" color="primary" class="mx-2">ビルド</v-btn>
-          <v-btn @click="toRooms" color="primary" class="mx-2">タクティクス（ルーム選択）</v-btn>
+          <v-btn @click="toBuilds" color="primary" class="mx-2">Build（ロボット構築）</v-btn>
+          <v-btn @click="toRooms" color="primary" class="mx-2">Tactics（対人戦）</v-btn>
         </v-col>
       </v-row>
 
