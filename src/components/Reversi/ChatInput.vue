@@ -4,7 +4,7 @@
         <!-- ローディング中はインジケータを表示 -->
         <p v-if="isChatLoading">ミープルボットが考え中...</p>
         <!-- ローディングでないときはボタンを表示 -->
-        <input v-else  v-model="input" @keyup.enter="send" placeholder="ミープルボットへの質問を入れてください..." />
+        <v-text-field  v-else  v-model="input" @keyup.enter="send" placeholder="ミープルボットへの質問を入れてください..." min-width="400"/>
     </div>
 </template>
 

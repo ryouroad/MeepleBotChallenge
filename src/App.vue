@@ -5,8 +5,8 @@
         <v-app-bar-nav-icon v-if="!isLargeScreen" @click="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>ミープルボットの挑戦</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn text :href="twitterUrl">管理者Twitter</v-btn>
-        <v-btn text :href="boardgamerUrl">管理者ボドゲーマ</v-btn>
+        <v-btn text :href="twitterUrl">管理者Xアカウント</v-btn>
+        <v-btn text :href="boardgamerUrl">管理者ボドゲーマアカウント</v-btn>
       </v-app-bar>
       
       <v-navigation-drawer v-model="drawer" :permanent="isLargeScreen" app>
@@ -40,6 +40,9 @@
           <v-alert v-if="getUserName" type="info">
             ようこそ{{ getUserName }}さん！一緒に楽しみましょう！
           </v-alert>
+          <v-alert v-else type="info">
+            ようこそ！ログインして新ゲームの先行プレイやオリジナルゲームを一緒に楽しみましょう！
+          </v-alert>
           <router-view name="Main">
           </router-view>
           
@@ -57,8 +60,7 @@
               <v-card-title>お問い合わせ</v-card-title>
               <v-card-text>
                 <p>ご質問やコメントがありましたら、お気軽に<a :href="twitterUrl">こちら</a>までお知らせください。</p>
-                <p>また、ボドゲーマアカウントは<a :href="boardgamerUrl">こちら</a>です。</p>
-                <p>どちらも筆者のアカウントです。お気軽にフォローいただけると嬉しいです。</p>
+                <p>管理者のXアカウントです。お気軽にフォローいただけると嬉しいです。</p>
               </v-card-text>
             </v-card>
           </section>

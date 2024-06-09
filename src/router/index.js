@@ -1,5 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import App from '@/App.vue'
+import { useStore } from 'vuex';
+import { computed } from 'vue';
 import MainViewer from '@/components/MainViewer.vue';
 import ArticleViewer from '@/components/Article/ArticleViewer.vue';
 import ReversiViewer from '@/components/Reversi/ReversiViewer.vue';
@@ -36,6 +38,14 @@ const routes = [
     components: {
       Main: BuildersTacticsViewer
     },
+    beforeEnter: (to) => {
+      const store = useStore();
+      const getUserName = computed(() => store.getters['authStore/getName']);
+      if (getUserName.value === ""){
+        return {name: 'Top'}
+      }
+      else to;
+    }
   },
   {
     path: '/articles/:id',

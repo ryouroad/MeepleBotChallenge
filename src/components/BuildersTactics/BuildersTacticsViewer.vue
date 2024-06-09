@@ -1,21 +1,41 @@
 <template>
-  <b-container id="builders-tactics-viewer" class="justify-content-center">
-    <div v-if="screen === 'menu'" id="menu-viewer">
-      <v-btn @click="toBuilds">ビルド</v-btn>
-      <v-btn @click="toRooms">タクティクス（ルーム選択）</v-btn>
-    </div>
-    <div v-if="screen === 'builds'" id="builds-viewer">
-    </div>
-    <div v-if="screen === 'rooms'" id="rooms-viewer">
-    </div>
-    <div v-if="screen === 'tactics'" id="tactics-viewer">
-      <PlayerIndicator :currentPlayer="game.currentPlayer" :winner="game.winner" />
-      <BuildersTacticsBoard :board="game.board" />
-    </div>
-    <p></p>
-    <img :src="meepleBotImage" alt="ミープルボット" style="width: 200px;" >
-    <FeedbackInput @send="sendFeedback" />
-  </b-container>
+  <v-container id="builders-tactics-viewer" class="d-flex flex-column align-center py-5">
+    <v-card class="pa-5" outlined max-width="1600px" width="100%">
+      <v-row v-if="screen === 'menu'" id="menu-viewer" class="d-flex justify-center">
+        <v-col cols="12" md="6" class="d-flex justify-center">
+          <v-btn @click="toBuilds" color="primary" class="mx-2">ビルド</v-btn>
+          <v-btn @click="toRooms" color="primary" class="mx-2">タクティクス（ルーム選択）</v-btn>
+        </v-col>
+      </v-row>
+
+      <v-row v-if="screen === 'builds'" id="builds-viewer">
+        <!-- ビルド画面のコンテンツ -->
+      </v-row>
+
+      <v-row v-if="screen === 'rooms'" id="rooms-viewer">
+        <!-- ルーム選択画面のコンテンツ -->
+      </v-row>
+
+      <v-row v-if="screen === 'tactics'" id="tactics-viewer" class="d-flex flex-column align-center">
+        <v-col cols="12" md="8">
+          <PlayerIndicator :currentPlayer="game.currentPlayer" :winner="game.winner" />
+        </v-col>
+        <v-col cols="12" md="8">
+          <BuildersTacticsBoard :board="game.board" />
+        </v-col>
+      </v-row>
+      
+      <v-row class="d-flex justify-center">
+        <v-col cols="12" md="6" class="d-flex justify-center">
+          <img :src="meepleBotImage" alt="ミープルボット" style="width: 200px;" class="mt-4">
+        </v-col>
+      </v-row>
+
+      <v-row class="d-flex justify-center">
+        <FeedbackInput @send="sendFeedback" />
+      </v-row>
+    </v-card>
+  </v-container>
 </template>
 
 <script setup>
@@ -42,4 +62,8 @@ export default {
 </script>
 
 <style scoped>
+#builders-tactics-viewer {
+  max-width: 1200px;
+  margin: auto;
+}
 </style>

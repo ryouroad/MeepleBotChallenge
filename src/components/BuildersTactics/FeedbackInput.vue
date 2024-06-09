@@ -5,7 +5,7 @@
         <!-- ローディング中はインジケータを表示 -->
         <p v-if="isFeedbackLoading">送信中...</p>
         <!-- ローディングでないときはボタンを表示 -->
-        <input v-else  v-model="input" @keyup.enter="send" placeholder="ご意見を入力してください。。。" />
+        <v-text-field  v-else  v-model="input" @keyup.enter="send" placeholder="ご意見を入力してください。。。" min-width="400"/>
     </div>
 </template>
 

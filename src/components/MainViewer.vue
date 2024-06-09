@@ -2,33 +2,51 @@
   <section id="boardgame">
     <v-row>
       <v-col cols="12" md="6">
-        <v-card>
-          <v-card-title>ミープルボット（AI）とのゲーム</v-card-title>
+        <v-card class="elevation-2 my-4">
+          <v-card-title class="headline">ミープルボット（AI）とのゲーム</v-card-title>
+          <v-divider></v-divider>
           <v-list>
             <v-list-item>
-              <router-link :to="`/reversi`">リバーシ</router-link>
+              <v-list-item-icon>
+                <v-icon>mdi-checkbox-multiple-blank-circle</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <router-link :to="`/reversi`">リバーシ</router-link>
+              </v-list-item-content>
             </v-list-item>
             <v-list-item>
-              <router-link :to="`/chess`">チェス</router-link>
+              <v-list-item-icon>
+                <v-icon>mdi-chess-queen</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <router-link :to="`/chess`">チェス</router-link>
+              </v-list-item-content>
             </v-list-item>
           </v-list>
         </v-card>
       </v-col>
       <v-col cols="12" md="6">
-        <v-card>
-          <v-card-title>オリジナルゲーム（対人戦、要ログイン）</v-card-title>
+        <v-card class="elevation-2 my-4">
+          <v-card-title class="headline">オリジナルゲーム（対人戦、要ログイン）</v-card-title>
+          <v-divider></v-divider>
           <v-list>
             <v-list-item>
-              <router-link :to="`/buildersTactics`">ビルダーズタクティクス</router-link>
+              <v-list-item-icon>
+                <v-icon>mdi-hammer-wrench</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <router-link :to="`/buildersTactics`">ビルダーズタクティクス</router-link>
+              </v-list-item-content>
             </v-list-item>
           </v-list>
         </v-card>
       </v-col>
     </v-row>
+    <v-spacer></v-spacer>
   </section>
 
   <section id="meeplebot">
-    <v-card>
+    <v-card class="my-4">
       <v-card-title>ミープルボット紹介（キャライメージ）</v-card-title>
       <v-row>
         <v-col cols="12" md="3">
@@ -51,10 +69,11 @@
         <p>このようにミープルボットは、技術と遊び心を融合させた、新しいタイプのロボットキャラクターであり、ユーザーにとって魅力的で有益な存在です。彼らはボードゲームを通じて、楽しみながら学び、成長することの価値を伝えます。</p>
       </v-card-text>
     </v-card>
+    <v-spacer></v-spacer>
   </section>
 
   <section id="articles">
-    <v-card>
+    <v-card class="my-4">
       <v-card-title>記事一覧</v-card-title>
       <v-card-text>
         <v-row>
@@ -77,6 +96,7 @@
         </v-row>
       </v-card-text>
     </v-card>
+    <v-spacer></v-spacer>
   </section>
 </template>
 
