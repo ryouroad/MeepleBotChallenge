@@ -4,6 +4,7 @@ import App from './App.vue'
 import store from './store'
 import router from './router/index'
 import VueGtag from 'vue-gtag-next'
+import vuetify from "./vuetify";
 
 const app = createApp(App)
 
@@ -15,4 +16,4 @@ app.use(VueGtag, {
     }
   },
   useDebugger: process.env.NODE_ENV !== 'production',
-}).use(store).use(router).mount('#app')
+}).use(store).use(router).use(vuetify).mount('#app')

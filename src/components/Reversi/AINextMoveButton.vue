@@ -3,7 +3,7 @@
     <!-- ローディング中はインジケータを表示 -->
     <p v-if="isNextMoveLoading">ミープルボットが次の手を計算中...</p>
     <!-- ローディングでないときはボタンを表示 -->
-    <button v-else @click="askAINextMove">ミープルボットに次の手を決めさせる</button>
+    <v-btn v-else @click="askAINextMove">ミープルボットに次の手を決めさせる</v-btn>
   </div>
 </template>
 

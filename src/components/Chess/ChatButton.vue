@@ -1,8 +1,8 @@
 <!-- ChatInput.vue -->
 <template>
     <div class="chat-input">
-        <button v-if="!isChatLoading" @click="send('戦況は？')">ミープルボットに戦況を聞く</button>
-        <button v-if="!isChatLoading" @click="send('最善手は？')">ミープルボットに最善手を聞く</button>
+        <v-btn v-if="!isChatLoading" @click="send('戦況は？')">ミープルボットに戦況を聞く</v-btn>
+        <v-btn v-if="!isChatLoading" @click="send('最善手は？')">ミープルボットに最善手を聞く</v-btn>
     </div>
 </template>
 

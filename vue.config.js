@@ -7,7 +7,8 @@ module.exports = {
   configureWebpack: {
     plugins: [
       new MiniCssExtractPlugin({
-        filename: 'style.css',
+        filename: 'css/[name].[contenthash:8].css',  // ユニークな名前を生成するように変更
+        chunkFilename: 'css/[name].[contenthash:8].css',  // ユニークな名前を生成するように変更
       }),
     ],
   },

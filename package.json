@@ -9,6 +9,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "axios": "^1.6.8",
     "core-js": "^3.8.3",
     "gh-pages": "^6.1.1",
@@ -16,6 +17,7 @@
     "vue-gtag-next": "^1.14.0",
     "vue-jwt-decode": "^0.1.0",
     "vue-router": "^4.3.0",
+    "vuetify": "^3.6.0-beta.0.0",
     "vuex": "^4.1.0",
     "vuex-persistedstate": "^4.1.0"
   },

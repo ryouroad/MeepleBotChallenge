@@ -459,14 +459,14 @@ export const chessStore = {
             // 白の合法手が存在するか確認
             Promise.all(whiteMovesPromises).then(whiteResults => {
                 const whiteHasLegalMoves = whiteResults.some(result => result);
-                console.log(whiteResults);
-                console.log(whiteHasLegalMoves);
+                // console.log(whiteResults);
+                // console.log(whiteHasLegalMoves);
                 
                 // 黒の合法手が存在するか確認
                 Promise.all(blackMovesPromises).then(blackResults => {
                     const blackHasLegalMoves = blackResults.some(result => result);
-                    console.log(blackResults);
-                    console.log(blackHasLegalMoves);
+                    // console.log(blackResults);
+                    // console.log(blackHasLegalMoves);
         
                     // 勝敗の判定
                     if (!whiteHasLegalMoves && blackHasLegalMoves) {

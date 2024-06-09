@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 import { articleStore } from './components/Article/ArticleStore';
 import { reversiStore } from './components/Reversi/ReversiStore';
 import { chessStore } from './components/Chess/ChessStore';
+import { buildersTacticsStore } from './components/BuildersTactics/BuildersTacticsStore';
 import VueJwtDecode from 'vue-jwt-decode';
 import createPersistedState from 'vuex-persistedstate';
 import { enableUserTracking, disableUserTracking } from './tag.js';
@@ -54,6 +55,7 @@ export default createStore({
     articleStore,
     reversiStore,
     chessStore,
+    buildersTacticsStore,
     authStore,
   },
   plugins: [createPersistedState()],

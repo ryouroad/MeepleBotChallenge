@@ -18,9 +18,11 @@ export default {
       getArticleById: 'articleStore/getArticleById'
     }),
     article() {
-      console.log(this.$route.params.id);
-      console.log(this.getArticleById(this.$route.params.id));
-      return this.getArticleById(this.$route.params.id);
+      // console.log(this.$route.params.id);
+      // console.log(this.getArticleById(this.$route.params.id));
+      const article = this.getArticleById(this.$route.params.id);
+      console.log("article:",article); 
+      return article;
     }
   }
 };
