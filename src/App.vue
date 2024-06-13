@@ -51,7 +51,7 @@
               <v-expansion-panel-text>
                 <v-list-item>
                   <router-link :to="`/buildersTactics`" style="text-decoration: none;  color: inherit;">
-                    <v-list-item-title>Builders Tactics</v-list-item-title>
+                    <v-list-item-title>Builders Tactics(開発中)</v-list-item-title>
                   </router-link>
                 </v-list-item>
               </v-expansion-panel-text>
@@ -119,6 +119,7 @@ export default {
     const store = useStore();
     const drawer = ref(true);
     const getUserName = computed(() => store.getters['authStore/getName']);
+    const getUserToken = computed(() => store.getters['authStore/getRefreshToken']);
     const baseUrl = process.env.BASE_URL;
     const loginUrl = `${COGNITO_URL}/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
     const logoutUrl = `${COGNITO_URL}/logout?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
@@ -141,11 +142,13 @@ export default {
     const handleLogin = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
-
+      const refresh_token = getUserToken.value;
       if (code) {
         getToken(code);
-      } else {
-        console.error('Authorization code not found in URL');
+      }
+      if (refresh_token != null && !code) {
+        console.log("refresh_token:",refresh_token);
+        refreshToken(refresh_token);
       }
     };
 
@@ -165,6 +168,25 @@ export default {
         store.dispatch('authStore/saveToken', response.data);
       } catch (error) {
         console.error('Error fetching token:', error);
+      }
+    };
+
+    const refreshToken = async token => {
+      try {
+        const response = await axios.post(`${COGNITO_URL}/oauth2/token`, new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: token,
+          client_id: CLIENT_ID,
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+
+        store.dispatch('authStore/saveToken', response.data);
+      } catch (error) {
+        console.error('Error fetching token:', error);
+        store.dispatch('authStore/removeToken');
       }
     };
 

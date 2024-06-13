@@ -10,18 +10,26 @@ import { enableUserTracking, disableUserTracking } from './tag.js';
 export const authStore = {
   namespaced: true,
   state: () => ({
-    token: "",
-    name: ""
+    refresh_token : null,
+    id_token : null,
+    access_token : null,
+    name: null
   }),
   mutations: {
     saveToken(state, { token, name }) {
-      state.token = token;
+      if(token.refresh_token){
+        state.refresh_token = token.refresh_token;
+      }
+      state.id_token = token.id_token;
+      state.access_token = token.access_token;
       state.name = name;
       enableUserTracking(name);
     },
     removeToken(state) {
-      state.token = "";
-      state.name = "";
+      state.refresh_token = null,
+      state.id_token = null,
+      state.access_token = null,
+      state.name = null;
       disableUserTracking();
     }
   },
@@ -44,7 +52,9 @@ export const authStore = {
     }
   },
   getters: {
-    getToken: state => state.token,
+    getRefreshToken: state => state.refresh_token,
+    getIdToken: state => state.id_token,
+    getAccessToken: state => state.access_token,
     getName: state => state.name
   }
 };
