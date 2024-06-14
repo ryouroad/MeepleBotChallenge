@@ -259,8 +259,31 @@ export const chessStore = {
         isChatLoading: false,
     },
     mutations: {
-        setGame(state, game) {
-            state.game = game
+        setGame(state) {
+            const newGame = {
+                board: Array(8).fill().map((_, i) => Array(8).fill().map((_, j) => {
+                    if (i === 0 & j === 0 | i === 0 & j === 7) return { type:"Rook", color: "Black", isPossibleMove: false, hasMoved: false }
+                    if (i === 0 & j === 1 | i === 0 & j === 6) return { type:"Knight", color: "Black", isPossibleMove: false, hasMoved: false }
+                    if (i === 0 & j === 2 | i === 0 & j === 5) return { type:"Bishop", color: "Black", isPossibleMove: false, hasMoved: false }
+                    if (i === 0 & j === 3) return { type:"Queen", color: "Black", isPossibleMove: false, hasMoved: false }
+                    if (i === 0 & j === 4) return { type:"King", color: "Black", isPossibleMove: false, hasMoved: false }
+                    if (i === 1) return { type:"Pawn", color: "Black", isPossibleMove: false, hasMoved: false }
+                    if (i === 6) return { type:"Pawn", color: "White", isPossibleMove: false, hasMoved: false }
+                    if (i === 7 & j === 0 | i === 7 & j === 7) return { type:"Rook", color: "White", isPossibleMove: false, hasMoved: false }
+                    if (i === 7 & j === 1 | i === 7 & j === 6) return { type:"Knight", color: "White", isPossibleMove: false, hasMoved: false }
+                    if (i === 7 & j === 2 | i === 7 & j === 5) return { type:"Bishop", color: "White", isPossibleMove: false, hasMoved: false }
+                    if (i === 7 & j === 3) return { type:"Queen", color: "White", isPossibleMove: false, hasMoved: false }
+                    if (i === 7 & j === 4) return { type:"King", color: "White", isPossibleMove: false, hasMoved: false }
+                    return { type:null, color: null, isPossibleMove: false, hasMoved: false }
+                })),
+                currentPlayer: 'White',
+                from: null,
+                possibleMoves: null,
+                showPromotionDialog: false,
+                promotionPosition: null,
+                lastMove: null,
+            }
+            state.game = newGame
         },
         addMessage(state, message) {
             state.chat.messages.push(message)
@@ -571,6 +594,9 @@ export const chessStore = {
               console.error('Error fetching next move:', error);
             }
             commit('setIsNextMoveLoading', false); // ローディング終了
-        },      
+        }, 
+        resetGame({commit}){
+            commit('setGame');
+        }    
     },
 }

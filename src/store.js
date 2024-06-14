@@ -6,6 +6,7 @@ import { buildersTacticsStore } from './components/BuildersTactics/BuildersTacti
 import VueJwtDecode from 'vue-jwt-decode';
 import createPersistedState from 'vuex-persistedstate';
 import { enableUserTracking, disableUserTracking } from './tag.js';
+import { commonStore } from './components/Common/commonStore';
 
 export const authStore = {
   namespaced: true,
@@ -67,6 +68,7 @@ export default createStore({
     chessStore,
     buildersTacticsStore,
     authStore,
+    commonStore,
   },
   plugins: [createPersistedState()],
 });

@@ -3,6 +3,7 @@
     <PlayerIndicator :currentPlayer="game.currentPlayer" :winner="game.winner" />
     <ChessBoard :board="game.board" />
     <PromotionDialog v-if="game.showPromotionDialog" @select="handlePromotionSelect" />
+    <ResetButton @send="resetGame" />
     <img :src="meepleBotImage" alt="ミープルボット" style="width: 200px;">
     <AINextMoveButton />
     <ChatWindow :messages="chat.messages" />
@@ -17,24 +18,41 @@ import meepleBotImage from '@/assets/MeepleBot/MeepleBotBoardGame.jpg';
 </script>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex';
 import ChessBoard from './ChessBoard.vue';
 import PlayerIndicator from './PlayerIndicator.vue';
 import PromotionDialog from './PromotionDialog.vue';
-import ChatWindow from './ChatWindow.vue'
-import ChatInput from './ChatInput.vue'
-import FeedbackInput from './FeedbackInput.vue'
+import ChatWindow from './ChatWindow.vue';
+import ChatInput from './ChatInput.vue';
+import ResetButton from '@/components/Common/ResetButton.vue';
+import FeedbackInput from '@/components/Common/FeedbackInput.vue';
 import AINextMoveButton from './AINextMoveButton.vue';
 import ChatButton from './ChatButton.vue';
 
 export default {
-  components: { ChessBoard, PlayerIndicator, PromotionDialog,  ChatWindow, ChatInput, AINextMoveButton, ChatButton, FeedbackInput },
-  computed: mapState({
-    game: state => state.chessStore.game,
-    chat: state => state.chessStore.chat
-  }),
+  components: {
+    ChessBoard,
+    PlayerIndicator,
+    PromotionDialog,
+    ChatWindow,
+    ChatInput,
+    AINextMoveButton,
+    ChatButton,
+    ResetButton,
+    FeedbackInput,
+  },
+  computed: {
+    ...mapState({
+      game: state => state.chessStore.game,
+      chat: state => state.chessStore.chat
+    })
+  },
   methods: {
-    ...mapActions('chessStore', ['sendMessage', 'sendFeedback']),
+    ...mapActions({
+      sendMessage: 'chessStore/sendMessage',
+      resetGame: 'chessStore/resetGame',
+      sendFeedback: 'commonStore/sendFeedback'
+    }),
     handlePromotionSelect({ pieceType }) {
       // console.log("handlePromotionSelect:"+pieceType+this.game.promotionPosition.x+this.game.promotionPosition.y);
       this.$store.commit('chessStore/promotePawn', { position: this.game.promotionPosition, newType: pieceType });
@@ -42,7 +60,6 @@ export default {
     },
   },
 }
-
 </script>
 
 <style scoped>

@@ -88,8 +88,16 @@ export const reversiStore = {
         isChatLoading: false,
     },
     mutations: {
-        setGame(state, game) {
-            state.game = game
+        setGame(state) {
+            const newGame = {
+                board: Array(8).fill().map((_, i) => Array(8).fill().map((_, j) => {
+                    if (i === 3 && j === 3 || i === 4 && j === 4) return 'white'
+                    if (i === 3 && j === 4 || i === 4 && j === 3) return 'black'
+                    return null
+                })),
+                currentPlayer: 'black',
+            }
+            state.game = newGame
         },
         addMessage(state, message) {
             state.chat.messages.push(message)
@@ -277,6 +285,9 @@ export const reversiStore = {
               console.error('Error fetching next move:', error);
             }
             commit('setIsNextMoveLoading', false); // ローディング終了
-        },        
+        },
+        resetGame({commit}){
+            commit('setGame');
+        }          
     },
 }

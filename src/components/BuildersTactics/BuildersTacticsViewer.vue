@@ -47,7 +47,7 @@ var screen = 'menu'
 import { mapState, mapActions } from 'vuex'
 import BuildersTacticsBoard from './BuildersTacticsBoard.vue';
 import PlayerIndicator from './PlayerIndicator.vue';
-import FeedbackInput from './FeedbackInput.vue'
+import FeedbackInput from '@/components/Common/FeedbackInput.vue';
 
 export default {
   components: { BuildersTacticsBoard, PlayerIndicator, FeedbackInput },
@@ -55,7 +55,7 @@ export default {
     game: state => state.buildersTacticsStore.game
   }),
   methods: {
-    ...mapActions('buildersTacticsStore', ['sendFeedback']),
+    ...mapActions('commonStore', ['sendFeedback']),
   },
 }
 

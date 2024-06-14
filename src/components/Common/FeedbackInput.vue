@@ -1,7 +1,7 @@
 <!-- FeedbackInput.vue -->
 <template>
     <div class="Feedback-input">
-        <p>ボードゲームAIやこのサイトへのご意見をお聞かせください。</p>
+        <p>ゲームやAI、このサイトへのご意見をお聞かせください。</p>
         <!-- ローディング中はインジケータを表示 -->
         <p v-if="isFeedbackLoading">送信中...</p>
         <!-- ローディングでないときはボタンを表示 -->
@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
     data() {
@@ -18,12 +18,19 @@ export default {
     },
     computed: {
         ...mapState({
-            isFeedbackLoading: state => state.reversiStore.isFeedbackLoading,
+            isFeedbackLoading: state => state.commonStore.isFeedbackLoading,
         }),
+        ...mapGetters({
+            getUserName: 'authStore/getName',
+        })
     },
     methods: {
         send() {
-            this.$emit('send', this.input)
+            const message = this.input
+            const name = this.getUserName? this.getUserName : "MeepleBotChallenge"
+            const page = this.$route.path
+            // console.log(message,name,page)
+            this.$emit('send', {message, name , page })
             this.input = ''
         },
     },
