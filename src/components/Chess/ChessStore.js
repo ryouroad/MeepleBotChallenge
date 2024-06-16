@@ -518,39 +518,43 @@ export const chessStore = {
             commit('setIsChatLoading', true); // ローディング開始
             commit('addMessage', { text: message, sender: 'user' })
             const validMoves = await dispatch('checkAllSafeMoves');
-            const post_response = await axios.post(SERVER_URL+'chess/chat', {
-                board: state.game.board,
-                currentPlayer: state.game.currentPlayer,
-                validMoves: validMoves,
-                question: message,
-            }, {
-                headers: {
-                    'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
-                    'x-thread-id': state.chat.threadId,
-                }
-            });
-            if(post_response.status===200){
-                // console.log(post_response)
-                var response = await axios.get(SERVER_URL+'chess/chat', {
+            try{
+                const post_response = await axios.post(SERVER_URL+'chess/chat', {
+                    board: state.game.board,
+                    currentPlayer: state.game.currentPlayer,
+                    validMoves: validMoves,
+                    question: message,
+                }, {
                     headers: {
                         'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
-                        'x-thread-id': post_response.data.threadId,
-                        'x-run-id': post_response.data.runId,
+                        'x-thread-id': state.chat.threadId,
                     }
                 });
-                while (response.status!=200){
-                    response = await axios.get(SERVER_URL+'chess/chat', {
+                if(post_response.status===200){
+                    // console.log(post_response)
+                    var response = await axios.get(SERVER_URL+'chess/chat', {
                         headers: {
                             'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
                             'x-thread-id': post_response.data.threadId,
                             'x-run-id': post_response.data.runId,
                         }
                     });
+                    while (response.status!=200){
+                        response = await axios.get(SERVER_URL+'chess/chat', {
+                            headers: {
+                                'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
+                                'x-thread-id': post_response.data.threadId,
+                                'x-run-id': post_response.data.runId,
+                            }
+                        });
+                    }
                 }
+                // APIからチャットの返答を受け取る
+                commit('setThreadId', response.data.threadId);
+                commit('addMessage', { text: response.data.text, sender: 'ai' })
+            } catch (error) {
+                console.error('Error fetching chat:', error);
             }
-            // APIからチャットの返答を受け取る
-            commit('setThreadId', response.data.threadId);
-            commit('addMessage', { text: response.data.text, sender: 'ai' })
             commit('setIsChatLoading', false); // ローディング終了
         },
         async getNextMove({ commit, state, dispatch }) {

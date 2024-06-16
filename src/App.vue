@@ -135,7 +135,6 @@ export default {
         element.scrollIntoView({ behavior: 'smooth' });
       }else{
         this.$router.push('/');
-
       }
     };
 

@@ -16,16 +16,20 @@ export const commonStore = {
         async sendFeedback({ commit }, {message, name, page}) {
             commit('setIsFeedbackLoading', true); // ローディング開始
             // console.log(message, name ,page)
-            const post_response = await axios.post(SERVER_URL+'feedback', {
-                feedback: message,
-                name: name,
-                page: page
-            }, {
-                headers: {
-                    'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
-                }
-            });
-            console.log(post_response)
+            try{
+                const post_response = await axios.post(SERVER_URL+'feedback', {
+                    feedback: message,
+                    name: name,
+                    page: page
+                }, {
+                    headers: {
+                        'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
+                    }
+                });
+                console.log(post_response)
+            } catch (error) {
+                console.error('Error fetching feedback:', error);
+            }
             commit('setIsFeedbackLoading', false); // ローディング終了
         },
     }

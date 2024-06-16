@@ -41,7 +41,7 @@ const routes = [
     beforeEnter: (to) => {
       const store = useStore();
       const getUserName = computed(() => store.getters['authStore/getName']);
-      if (getUserName.value === ""){
+      if (getUserName.value === null){
         return {name: 'Top'}
       }
       else to;
