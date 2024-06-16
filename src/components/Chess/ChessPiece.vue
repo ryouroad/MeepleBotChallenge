@@ -1,7 +1,7 @@
 <template>
-  <div class="chess-piece" :class="{ 'invert-color': piece.color === 'White' }">
-    <img v-if=piece.type :src="pieceImageSrc" :alt="piece.type" />
-  </div>
+  <v-icon :class="['chess-piece', { 'invert-color': piece.color === 'White' }]">
+    mdi-chess-{{ pieceName }}
+  </v-icon>
 </template>
 
 <script>
@@ -13,11 +13,11 @@ export default {
     },
   },
   computed: {
-    pieceImageSrc() {
-      if (this.piece.type === null) {
+    pieceName() {
+      if (!this.piece.type) {
         return '';
       }
-      return `${require('@/assets/Chess/'+this.piece.type+'.webp')}`;
+      return this.piece.type.toLowerCase(); // Example: 'Pawn' -> 'pawn'
     },
   },
 };
@@ -28,16 +28,12 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.chess-piece img {
-  width: 100%;
-  height: 100%;
+  font-size: 2.4rem; /* Adjust size as needed */
+  color: black; /* Default color for black pieces */
 }
 
 /* 白い駒の色を反転 */
-.invert-color img {
-  filter: invert(1);
+.invert-color {
+  color: white
 }
-
 </style>

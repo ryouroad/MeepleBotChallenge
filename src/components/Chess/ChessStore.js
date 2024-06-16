@@ -284,6 +284,13 @@ export const chessStore = {
                 lastMove: null,
             }
             state.game = newGame
+            const newChat = {
+                messages: [],
+                threadId: null,
+            }
+            state.chat = newChat,
+            state.isNextMoveLoading = false,
+            state.isChatLoading = false
         },
         addMessage(state, message) {
             state.chat.messages.push(message)
