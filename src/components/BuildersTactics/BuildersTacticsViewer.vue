@@ -1,34 +1,31 @@
 <template>
   <v-container id="builders-tactics-viewer" class="d-flex flex-column align-center py-5">
     <v-card class="pa-5" outlined max-width="1600px" width="100%">
-      <v-row v-if="screen === 'menu'" id="menu-viewer" class="d-flex justify-center">
+      <v-row id="menu-viewer" class="d-flex justify-center">
         <v-col cols="12" md="6" class="d-flex justify-center">
-          <v-btn @click="toBuilds" color="primary" class="mx-2">Build（ロボット構築）</v-btn>
+          <v-btn @click="toBuilds" color="primary" class="mx-2">Build List（ビルド確認）</v-btn>
+          <v-btn @click="toBuildCreator" color="primary" class="mx-2">Create Build（ビルド作成）</v-btn>
           <v-btn @click="toRooms" color="primary" class="mx-2">Tactics（対人戦）</v-btn>
         </v-col>
       </v-row>
 
-      <v-row v-if="screen === 'builds'" id="builds-viewer">
-        <!-- ビルド画面のコンテンツ -->
+      <v-row v-if="isBuildsScreen" id="builds-viewer">
+        <BuildViewer />
       </v-row>
 
-      <v-row v-if="screen === 'rooms'" id="rooms-viewer">
+      <v-row v-if="isBuildCreatorScreen" id="build-creator-viewer">
+        <BuildCreator />
+      </v-row>
+
+      <v-row v-if="isRoomsScreen" id="rooms-viewer">
         <!-- ルーム選択画面のコンテンツ -->
       </v-row>
 
-      <v-row v-if="screen === 'tactics'" id="tactics-viewer" class="d-flex flex-column align-center">
-        <v-col cols="12" md="8">
-          <PlayerIndicator :currentPlayer="game.currentPlayer" :winner="game.winner" />
-        </v-col>
-        <v-col cols="12" md="8">
-          <BuildersTacticsBoard :board="game.board" />
-        </v-col>
+      <v-row v-if="isTacticsScreen" id="tactics-viewer" class="d-flex flex-column align-center">
       </v-row>
       
       <v-row class="d-flex justify-center">
-        <v-col cols="12" md="6" class="d-flex justify-center">
-          <img :src="meepleBotImage" alt="ミープルボット" style="width: 200px;" class="mt-4">
-        </v-col>
+        <img :src="meepleBotImage" alt="ミープルボット" class="mt-4" style="width: 200px;">
       </v-row>
 
       <v-row class="d-flex justify-center">
@@ -40,25 +37,35 @@
 
 <script setup>
 import meepleBotImage from '@/assets/MeepleBot/MeepleBotBoardGame.jpg';
-var screen = 'menu'
-</script>
-
-<script>
-import { mapState, mapActions } from 'vuex'
-import BuildersTacticsBoard from './BuildersTacticsBoard.vue';
-import PlayerIndicator from './PlayerIndicator.vue';
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
 import FeedbackInput from '@/components/Common/FeedbackInput.vue';
+import BuildViewer from './BuildViewer.vue';
+import BuildCreator from './BuildCreator.vue'; 
 
-export default {
-  components: { BuildersTacticsBoard, PlayerIndicator, FeedbackInput },
-  computed: mapState({
-    game: state => state.buildersTacticsStore.game
-  }),
-  methods: {
-    ...mapActions('commonStore', ['sendFeedback']),
-  },
-}
+const store = useStore();
+const screen = ref('menu');
 
+const isBuildsScreen = computed(() => screen.value === 'builds');
+const isRoomsScreen = computed(() => screen.value === 'rooms');
+const isTacticsScreen = computed(() => screen.value === 'tactics');
+const isBuildCreatorScreen = computed(() => screen.value === 'build-creator');
+
+const sendFeedback = (message) => {
+  store.dispatch('commonStore/sendFeedback', message);
+};
+
+const toBuilds = () => {
+  screen.value = 'builds';
+};
+
+const toBuildCreator = () => {
+  screen.value = 'build-creator'; // ビルド作成画面への切り替え
+};
+
+const toRooms = () => {
+  screen.value = 'rooms';
+};
 </script>
 
 <style scoped>

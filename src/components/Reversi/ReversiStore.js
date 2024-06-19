@@ -129,24 +129,9 @@ export const reversiStore = {
         },
         setThreadId(state, threadId) {
             state.chat.threadId = threadId;
-        },
-        setIsFeedbackLoading(state, isFeedbackLoading){
-            state.isFeedbackLoading = isFeedbackLoading;
         }
     },
     actions: {
-        async sendFeedback({ commit }, message) {
-            commit('setIsFeedbackLoading', true); // ローディング開始
-            const post_response = await axios.post(SERVER_URL+'feedback', {
-                feedback: message,
-            }, {
-                headers: {
-                    'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
-                }
-            });
-            console.log(post_response)
-            commit('setIsFeedbackLoading', false); // ローディング終了
-        },
         async sendMessage({ commit, state }, message) {
             commit('setIsChatLoading', true); // ローディング開始
             commit('addMessage', { text: message, sender: 'user' })

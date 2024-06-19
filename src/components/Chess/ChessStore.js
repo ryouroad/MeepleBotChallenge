@@ -310,9 +310,6 @@ export const chessStore = {
         setThreadId(state, threadId) {
             state.chat.threadId = threadId;
         },
-        setIsFeedbackLoading(state, isFeedbackLoading){
-            state.isFeedbackLoading = isFeedbackLoading;
-        },
         setFrom(state, position){
             state.game.from = position
         },
@@ -508,18 +505,6 @@ export const chessStore = {
                     }
                 });
             });
-        },        
-        async sendFeedback({ commit }, message) {
-            commit('setIsFeedbackLoading', true); // ローディング開始
-            const post_response = await axios.post(SERVER_URL+'feedback', {
-                feedback: message,
-            }, {
-                headers: {
-                    'x-api-key': API_KEY, // ヘッダーにAPIキーを追加
-                }
-            });
-            console.log(post_response)
-            commit('setIsFeedbackLoading', false); // ローディング終了
         },
         async sendMessage({ dispatch, commit, state }, message) {
             commit('setIsChatLoading', true); // ローディング開始
