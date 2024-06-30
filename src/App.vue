@@ -146,7 +146,7 @@ export default {
         getToken(code);
       }
       if (refresh_token != null && !code) {
-        console.log("refresh_token:",refresh_token);
+        // console.log("refresh_token:",refresh_token);
         refreshToken(refresh_token);
       }
     };
