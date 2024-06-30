@@ -12,6 +12,10 @@ export const buildersTacticsStore = {
                 build_name: "",
             },
         ],
+        teamInfo:{
+            colors: ['#FF5733', '#33FF57', '#3357FF', '#F3FF33'],
+            icons: ['mdi-bat', 'mdi-snake', 'mdi-dolphin', 'mdi-jellyfish'],
+        },
     },
     mutations: {
         setCurrentGameId(state, gameId) {
@@ -46,5 +50,6 @@ export const buildersTacticsStore = {
         gameInfo: state => state.gameInfo,
         builds: state => state.builds,
         field: state => state.gameInfo.field,
+        teamInfo: state => state.teamInfo,
     },
 };

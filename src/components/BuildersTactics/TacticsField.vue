@@ -25,13 +25,15 @@ const store = useStore();
 
 // Vuexストアのフィールド状態を取得
 const field = computed(() => store.getters['buildersTacticsStore/field']);
+const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 
 // セルを選択した際にユニットIDを配置し、フィールドを更新
 const selectCell = (rowIndex, cellIndex) => {
     const newField = JSON.parse(JSON.stringify(field.value));
-    console.error(props.selectedUnit)
-    newField[rowIndex][cellIndex].unit = props.selectedUnit.build_id;
-    store.dispatch('buildersTacticsStore/setField', newField);
+    if(gameInfo.value.status === 'in_game' && gameInfo.value.phase === 'initialize'){
+        newField[rowIndex][cellIndex].unit = props.selectedUnit.build_id;
+        store.dispatch('buildersTacticsStore/setField', newField);
+    }
 };
 </script>
 

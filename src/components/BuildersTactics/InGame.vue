@@ -13,8 +13,8 @@
         <v-btn v-if="gameInfo.phase !== 'initialize'" @click="surrender" color="primary">降参</v-btn>
         <TacticsField :field="gameInfo.field" :selectedUnit="localSelectedUnit"/>
         <v-select v-if="gameInfo.phase == 'initialize'" v-model="localSelectedUnit" :items="builds" item-title="build_name" item-value="build_id" label="ビルドを選択" return-object></v-select>
-        <BuildViewer />
         <v-btn v-if="gameInfo.phase === 'initialize'" @click="completePlacement" color="primary">ユニット配置完了</v-btn>
+        <BuildViewer />
     </div>
 </template>
 

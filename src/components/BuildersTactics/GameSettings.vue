@@ -16,9 +16,9 @@
                 </v-list-item-content>
             </v-list-item>
         </v-list>
-        <v-btn @click="updateSettings">ゲーム設定の更新</v-btn>
-        <v-btn @click="agree">ゲーム設定に同意</v-btn>
-        <v-btn @click="leave">ゲームから退出</v-btn>
+        <v-btn @click="updateSettings" color="primary">ゲーム設定の更新</v-btn>
+        <v-btn @click="agree" color="primary">ゲーム設定に同意</v-btn>
+        <v-btn @click="leave" color="primary">ゲームから退出</v-btn>
     </div>
 </template>
 

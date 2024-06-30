@@ -3,8 +3,11 @@
         <h3>プレイヤー情報</h3>
         <v-row>
             <v-col v-for="(team, index) in props.teams" :key="index" cols="12" md="6">
-                <v-card outlined>
-                    <v-card-title>Team {{ index + 1 }}</v-card-title>
+                <v-card :style="{ borderColor: teamInfo.colors[index], borderWidth: '2px', borderStyle: 'solid' }">
+                    <v-card-title :style="{ color: teamInfo.colors[index] }">
+                        <v-icon>{{ teamInfo.icons[index] }}</v-icon>
+                        Team {{ index + 1 }}
+                    </v-card-title>
                     <v-divider></v-divider>
                     <v-card-text>
                         <v-list dense>
@@ -24,9 +27,23 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, computed } from 'vue';
+import { useStore } from 'vuex';
 
 const props = defineProps({
     teams: Array
 });
+const store = useStore();
+const teamInfo = computed(() => store.getters['buildersTacticsStore/teamInfo']);
 </script>
+
+<style scoped>
+.v-card-title {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+.v-card-title v-icon {
+    margin-right: 8px;
+}
+</style>
