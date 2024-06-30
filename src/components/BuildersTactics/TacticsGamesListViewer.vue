@@ -2,7 +2,7 @@
     <v-container>
         <v-row class="d-flex justify-center mb-4">
             <v-col cols="12" sm="6" md="4" class="d-flex justify-center">
-                <v-btn @click="fetchGames" color="primary" class="mx-2">ゲーム一覧取得</v-btn>
+                <v-btn @click="fetchGames" color="primary" class="mx-2">ゲーム一覧更新</v-btn>
             </v-col>
             <v-col cols="12" sm="6" md="4" class="d-flex justify-center">
                 <v-btn @click="handleCreateGame" color="primary" class="mx-2">ゲーム作成</v-btn>
@@ -35,6 +35,7 @@
                     </v-card-text>
                     <v-card-actions>
                         <v-btn @click="handleJoinGame(game.game_id)" color="primary">参加</v-btn>
+                        <v-btn v-if="isCurrentUserInGame(game)" @click="handleLeaveGame(game.game_id)" color="error">退出</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-col>
@@ -43,9 +44,9 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { getGames, createGame, joinGame } from './BuildersTacticsApi';
+import { getGames, createGame, joinGame, leaveGame } from './BuildersTacticsApi';
 
 const props = defineProps({
     toTactics: Function
@@ -53,6 +54,7 @@ const props = defineProps({
 
 const store = useStore();
 const games = ref([]);
+const currentUserId = ref(store.getters['authStore/getName']);
 
 const fetchGames = async () => {
     try {
@@ -76,10 +78,18 @@ const handleJoinGame = async (gameId) => {
     try {
         await joinGame(gameId);
         store.dispatch('buildersTacticsStore/setCurrentGameId', gameId);
-        // 参加後にtactics画面に遷移
         props.toTactics();
     } catch (error) {
         console.error(`ゲーム ${gameId} への参加に失敗しました:`, error);
+    }
+};
+
+const handleLeaveGame = async (gameId) => {
+    try {
+        await leaveGame(gameId, currentUserId.value);
+        fetchGames(); // ゲーム一覧を再取得して表示を更新
+    } catch (error) {
+        console.error(`ゲーム ${gameId} からの退出に失敗しました:`, error);
     }
 };
 
@@ -87,4 +97,11 @@ const handleJoinGame = async (gameId) => {
 const getPlayerCount = (game) => {
     return game.teams.reduce((count, team) => count + team.length, 0);
 };
+
+// 現在のユーザーが特定のゲームに参加しているかどうかをチェックするヘルパー関数
+const isCurrentUserInGame = (game) => {
+    return game.teams.some(team => team.some(player => player.player_id === currentUserId.value));
+};
+
+onMounted(fetchGames);
 </script>

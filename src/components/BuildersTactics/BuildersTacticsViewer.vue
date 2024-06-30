@@ -29,7 +29,7 @@
       </v-row>
 
       <v-row v-if="isTacticsScreen" id="tactics-viewer" class="d-flex flex-column align-center">
-        <TacticsViewer />
+        <TacticsViewer :toGames="toGames"/>
       </v-row>
 
       <v-row class="d-flex justify-center">
