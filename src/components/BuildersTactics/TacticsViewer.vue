@@ -4,81 +4,28 @@
             <v-card-title>
                 <v-row justify="space-between">
                     <span>ゲームステータス: {{ gameInfo.status }}</span>
-                    <span>フェイズ: {{ gameInfo.phase }}</span>
                 </v-row>
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-                <v-list-item>
-                    <v-list-item-content>
-                        <v-list-item-title>ターン: {{ gameInfo.turn }}</v-list-item-title>
-                        <v-list-item-subtitle>ターンプレイヤー: {{ gameInfo.turn_player }}</v-list-item-subtitle>
-                        <v-list-item-subtitle>フェイズプレイヤー: {{ gameInfo.phase_player }}</v-list-item-subtitle>
-                    </v-list-item-content>
-                </v-list-item>
+                <PlayerInfo :teams="gameInfo.teams" />
                 <v-divider class="my-4"></v-divider>
-                <div>
-                    <h3>プレイヤー情報</h3>
-                    <v-row>
-                        <v-col v-for="(team, index) in gameInfo.teams" :key="index" cols="12" md="6">
-                            <v-card outlined>
-                                <v-card-title>Team {{ index + 1 }}</v-card-title>
-                                <v-divider></v-divider>
-                                <v-card-text>
-                                    <v-list dense>
-                                        <v-list-item v-for="player in team" :key="player.player_id">
-                                            <v-list-item-content>
-                                                <v-list-item-title>Player: {{ player.player_id }}</v-list-item-title>
-                                                <v-list-item-subtitle>Score: {{ player.score }}</v-list-item-subtitle>
-                                                <v-list-item-subtitle>Status: {{ player.agreement }}</v-list-item-subtitle>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-list>
-                                </v-card-text>
-                            </v-card>
-                        </v-col>
-                    </v-row>
-                </div>
-                <v-divider class="my-4"></v-divider>
-                <div v-if="gameInfo.status === 'setting'">
-                    <h3>ゲーム設定</h3>
-                    <v-list dense>
-                        <v-list-item>
-                            <v-list-item-content>
-                                <v-select v-model="gameInfo.setting.rule" :items="['normal', 'advanced']" label="ルール"></v-select>
-                                <v-select v-model="gameInfo.setting.player_order" :items="['random', 'fixed']" label="プレイヤー順"></v-select>
-                                <v-select v-model="gameInfo.setting.initial_area" :items="['normal', 'extended']" label="初期エリア"></v-select>
-                                <v-text-field v-model="gameInfo.setting.player_number" label="プレイヤー数" type="number" min="2" max="8"></v-text-field>
-                                <v-text-field v-model="gameInfo.setting.team_number" label="チーム数" type="number" min="2" max="4"></v-text-field>
-                                <v-text-field v-model="gameInfo.setting.max_turn" label="最大ターン数" type="number" min="1" max="100"></v-text-field>
-                                <v-text-field v-model="gameInfo.setting.field_size" label="フィールドサイズ" type="number" min="3" max="20"></v-text-field>
-                                <v-text-field v-model="gameInfo.setting.max_cost" label="最大コスト" type="number" min="3" max="1000"></v-text-field>
-                                <v-text-field v-model="gameInfo.setting.max_build" label="最大ビルド数" type="number" min="1" max="10"></v-text-field>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list>
-                    <v-btn @click="updateGameSettings">ゲーム設定の更新</v-btn>
-                    <v-btn @click="handleAgreement">ゲーム設定に同意</v-btn>
-                    <v-btn @click="handleLeaveGame">ゲームから退出</v-btn>
-                </div>
-                <div v-if="gameInfo.status === 'completed'">
-                    <h3>ゲーム結果</h3>
-                    <v-list-item>
-                        <v-list-item-content>
-                            <v-list-item-title>勝者: {{ gameInfo.winner }}</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                </div>
+                <GameSettings v-if="gameInfo.status === 'setting'" :settings="gameInfo.setting" @update="updateGameSettings" @agree="handleAgreement" @leave="handleLeaveGame" />
+                <GameResults v-if="gameInfo.status === 'completed'" :winner="gameInfo.winner" />
+                <InGame v-if="gameInfo.status === 'in_game'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender"/>
             </v-card-text>
         </v-card>
-        <v-btn @click="fetchGameInfo" class="mt-4">更新</v-btn>
     </v-container>
 </template>
 
 <script setup>
-import { defineProps, computed, onMounted } from 'vue';
+import { computed, onMounted, ref, onUnmounted, defineProps } from 'vue';
 import { useStore } from 'vuex';
-import { getPlayerGame, leaveGame, updateGameSetting } from './BuildersTacticsApi';
+import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit } from './BuildersTacticsApi';
+import PlayerInfo from './PlayerInfo.vue';
+import GameSettings from './GameSettings.vue';
+import GameResults from './GameResults.vue';
+import InGame from './InGame.vue';
 
 const props = defineProps({
     toGames: Function
@@ -88,6 +35,7 @@ const store = useStore();
 const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 const currentGameId = computed(() => store.getters['buildersTacticsStore/currentGameId']);
 const playerId = computed(() => store.getters['authStore/getName']);
+const builds = computed(() => store.getters['buildersTacticsStore/builds']);
 
 const fetchGameInfo = async () => {
     if (currentGameId.value && playerId.value) {
@@ -100,6 +48,15 @@ const fetchGameInfo = async () => {
     }
 };
 
+const fetchBuilds = async () => {
+    try {
+        const response = await getBuilds();
+        store.dispatch('buildersTacticsStore/setBuilds', response.builds);
+    } catch (error) {
+        console.error('Error fetching builds:', error);
+    }
+};
+
 const updateGameSettings = async () => {
     try {
         await updateGameSetting(currentGameId.value, gameInfo.value.setting);
@@ -108,9 +65,32 @@ const updateGameSettings = async () => {
     }
 };
 
-const handleAgreement = () => {
-    console.log('同意ボタンが押されました');
-    // 実際には何も実行しない
+const handleAgreement = async () => {
+    try {
+        const param = {
+            status: gameInfo.value.status,
+            agreement: "agree"
+        }
+        const response = await proceedGame(currentGameId.value, param);
+        store.dispatch('buildersTacticsStore/setGameInfo', response);
+        console.log('Game proceeded successfully');
+    } catch (error) {
+        console.error('Error proceeding game:', error);
+    }
+};
+
+const handleSurrender = async () => {
+    try {
+        const param = {
+            status: gameInfo.value.status,
+            agreement: "surrender"
+        }
+        const response = await proceedGame(currentGameId.value, param);
+        store.dispatch('buildersTacticsStore/setGameInfo', response);
+        console.log('Game proceeded successfully');
+    } catch (error) {
+        console.error('Error proceeding game:', error);
+    }
 };
 
 const handleLeaveGame = async () => {
@@ -122,7 +102,30 @@ const handleLeaveGame = async () => {
     }
 };
 
-onMounted(fetchGameInfo);
+const completeUnitPlacement = async () => {
+    try {
+        const fieldData = {
+            field: gameInfo.value.field,
+            agreement: "battle"
+        };
+        const response = await placeUnit(currentGameId.value, fieldData);
+        console.log('Units placed successfully:', response);
+    } catch (error) {
+        console.error('Error placing units:', error);
+    }
+};
+
+const intervalId = ref(null);
+
+onMounted(() => {
+    fetchGameInfo();
+    fetchBuilds();
+    intervalId.value = setInterval(fetchGameInfo, 300000);
+});
+
+onUnmounted(() => {
+    clearInterval(intervalId.value);
+});
 </script>
 
 <style scoped>

@@ -102,6 +102,28 @@ export const updateGameSetting = async (gameId, settings) => {
   }
 };
 
+// ゲーム進行
+export const proceedGame = async (gameId, status) => {
+  try {
+    const response = await apiClient.post(`/games/${gameId}/status`, status);
+    return response.data;
+  } catch (error) {
+    console.error(`Error proceeding game status for game ${gameId}:`, error);
+    throw error;
+  }
+};
+
+// フェイズ進行
+export const proceedPhase = async (gameId, phase) => {
+  try {
+    const response = await apiClient.post(`/games/${gameId}/phase`, { phase });
+    return response.data;
+  } catch (error) {
+    console.error(`Error proceeding phase for game ${gameId}:`, error);
+    throw error;
+  }
+};
+
 // ユニット配置
 export const placeUnit = async (gameId, units) => {
   try {
@@ -120,28 +142,6 @@ export const getUnitInfo = async (gameId, unitId) => {
     return response.data;
   } catch (error) {
     console.error(`Error fetching unit info for unit ${unitId} in game ${gameId}:`, error);
-    throw error;
-  }
-};
-
-// ゲーム進行
-export const proceedGame = async (gameId, status) => {
-  try {
-    const response = await apiClient.post(`/games/${gameId}/status`, { status });
-    return response.data;
-  } catch (error) {
-    console.error(`Error proceeding game status for game ${gameId}:`, error);
-    throw error;
-  }
-};
-
-// フェイズ進行
-export const proceedPhase = async (gameId, phase) => {
-  try {
-    const response = await apiClient.post(`/games/${gameId}/phase`, { phase });
-    return response.data;
-  } catch (error) {
-    console.error(`Error proceeding phase for game ${gameId}:`, error);
     throw error;
   }
 };

@@ -45,7 +45,7 @@ onMounted(fetchBuilds);
 <template>
   <v-container>
     <div v-if="selectedBuild">
-      <v-btn @click="goBack" color="primary">Back to Builds</v-btn>
+      <v-btn @click="goBack" color="primary">Back to Builds List</v-btn>
       <v-card>
         <v-img :src="selectedBuild.build_image_url" :alt="selectedBuild.build_name" contain></v-img>
         <v-card-title>{{ selectedBuild.build_name }} Details</v-card-title>
