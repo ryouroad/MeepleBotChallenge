@@ -12,7 +12,7 @@
                 <v-divider class="my-4"></v-divider>
                 <GameSettings v-if="gameInfo.status === 'setting'" :settings="gameInfo.setting" @update="updateGameSettings" @agree="handleAgreement" @leave="handleLeaveGame" />
                 <GameResults v-if="gameInfo.status === 'completed'" :winner="gameInfo.winner" />
-                <InGame v-if="gameInfo.status === 'in_game'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender"/>
+                <InGame v-if="gameInfo.status === 'in_game'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @fetchUnitInfo="fetchUnitInfo"/>
             </v-card-text>
         </v-card>
     </v-container>
@@ -21,7 +21,7 @@
 <script setup>
 import { computed, onMounted, ref, onUnmounted, defineProps } from 'vue';
 import { useStore } from 'vuex';
-import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit } from './BuildersTacticsApi';
+import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnitInfo } from './BuildersTacticsApi';
 import PlayerInfo from './PlayerInfo.vue';
 import GameSettings from './GameSettings.vue';
 import GameResults from './GameResults.vue';
@@ -45,6 +45,15 @@ const fetchGameInfo = async () => {
         } catch (error) {
             console.error('Error fetching game info:', error);
         }
+    }
+};
+
+const fetchUnitInfo = async (unitId) => {
+    try {
+        const unitInfoData = await getUnitInfo(currentGameId.value, unitId);
+        store.dispatch('buildersTacticsStore/setUnitInfo', unitInfoData);
+    } catch (error) {
+        console.error('Error fetching game info:', error);
     }
 };
 
