@@ -3,8 +3,9 @@ export const buildersTacticsStore = {
     namespaced: true,
     state: {
         currentGameId: null,
-        gameInfo: {
-            field: null,
+        teamInfo:{
+            colors: ['#FF5733', '#33FF57', '#3357FF', '#F3FF33'],
+            icons: ['mdi-bat', 'mdi-snake', 'mdi-dolphin', 'mdi-jellyfish'],
         },
         builds: [
             {
@@ -12,9 +13,8 @@ export const buildersTacticsStore = {
                 build_name: "",
             },
         ],
-        teamInfo:{
-            colors: ['#FF5733', '#33FF57', '#3357FF', '#F3FF33'],
-            icons: ['mdi-bat', 'mdi-snake', 'mdi-dolphin', 'mdi-jellyfish'],
+        gameInfo: {
+            field: null,
         },
         units: [],
     },

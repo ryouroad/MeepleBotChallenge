@@ -15,7 +15,6 @@
                                 </v-icon>
                             </v-img>
                         </div>
-                        <span v-else>{{ cell }}</span>
                     </v-card-title>
                 </v-card>
             </v-col>
@@ -55,8 +54,13 @@ const selectCell = (rowIndex, cellIndex) => {
 
 const getUnitImage = (unitId) => {
     const unit = units.value.find(u => u.unit_id === unitId);
-    const build = builds.value.find(b => b.build_id === unit.build_id);
-    return build ? build.build_image_url : '';
+    if(unit){
+        const build = builds.value.find(b => b.build_id === unit.build_id);
+        return build ? build.build_image_url : '';
+    }else{
+        const build = builds.value.find(b => b.build_id === unitId);
+        return build ? build.build_image_url : '';
+    }
 };
 
 const getTeamColor = (unitId) => {

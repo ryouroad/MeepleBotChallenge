@@ -48,21 +48,21 @@ const fetchGameInfo = async () => {
     }
 };
 
-const fetchUnitInfo = async (unitId) => {
-    try {
-        const unitInfoData = await getUnitInfo(currentGameId.value, unitId);
-        store.dispatch('buildersTacticsStore/setUnitInfo', unitInfoData);
-    } catch (error) {
-        console.error('Error fetching game info:', error);
-    }
-};
-
 const fetchBuilds = async () => {
     try {
         const response = await getBuilds();
         store.dispatch('buildersTacticsStore/setBuilds', response.builds);
     } catch (error) {
         console.error('Error fetching builds:', error);
+    }
+};
+
+const fetchUnitInfo = async (unitId) => {
+    try {
+        const unitInfoData = await getUnitInfo(currentGameId.value, unitId);
+        store.dispatch('buildersTacticsStore/setUnitInfo', unitInfoData);
+    } catch (error) {
+        console.error('Error fetching game info:', error);
     }
 };
 
@@ -129,6 +129,7 @@ const intervalId = ref(null);
 onMounted(() => {
     fetchGameInfo();
     fetchBuilds();
+    fetchUnitInfo();
     intervalId.value = setInterval(fetchGameInfo, 300000);
 });
 
