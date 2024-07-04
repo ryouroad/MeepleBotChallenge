@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <v-row v-for="(row, rowIndex) in field" :key="rowIndex">
-            <v-col v-for="(cell, cellIndex) in row" :key="cellIndex" cols="1">
+            <v-col v-for="(cell, cellIndex) in row" :key="cellIndex">
                 <v-card 
                     class="pa-2" 
                     @click="selectCell(rowIndex, cellIndex)"
@@ -23,15 +23,8 @@
 </template>
 
 <script setup>
-import { computed, defineProps, defineEmits } from 'vue';
+import { computed, defineEmits } from 'vue';
 import { useStore } from 'vuex';
-
-const props = defineProps({
-    selectedUnit: {
-        type: String,
-        required: true
-    }
-});
 
 const emit = defineEmits(['fetchUnitInfo']);
 
@@ -41,11 +34,13 @@ const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 const builds = computed(() => store.getters['buildersTacticsStore/builds']);
 const units = computed(() => store.getters['buildersTacticsStore/units']);
 const teamInfo = computed(() => store.getters['buildersTacticsStore/teamInfo']);
+const selectedBuild = computed(() => store.getters['buildersTacticsStore/selectedBuild']);
+
 
 const selectCell = (rowIndex, cellIndex) => {
     const newField = JSON.parse(JSON.stringify(field.value));
     if(gameInfo.value.phase === 'initialize'){
-        newField[rowIndex][cellIndex].unit = props.selectedUnit.build_id;
+        newField[rowIndex][cellIndex].unit = selectedBuild.value.build_id;
         store.dispatch('buildersTacticsStore/setField', newField);
     }else{
         emit('fetchUnitInfo', field.value[rowIndex][cellIndex].unit);
@@ -99,7 +94,7 @@ const getTeamIcon = (unitId) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50px;
+    height: 100px;
     position: relative;
 }
 
@@ -115,20 +110,77 @@ const getTeamIcon = (unitId) => {
     height: 40px;
 }
 
+@media (max-width: 600px) {
+    .unit-container {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (max-width: 900px) {
+    .unit-container {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .unit-container {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+@media (min-width: 1201px) {
+    .unit-container {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+
 .unit-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 0; /* これにより画像が四角形になります */
+    border-radius: 0;
 }
+
+@media (max-width: 600px) {
+    .unit-image {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (max-width: 900px) {
+    .unit-image {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .unit-image {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+@media (min-width: 1201px) {
+    .unit-image {
+        width: 60px;
+        height: 60px;
+    }
+}
+
 
 .icon-overlay {
     position: absolute;
     bottom: 0;
     right: 0;
     opacity: 0.8;
-    font-size: 20px; /* 必要に応じてサイズを調整 */
-    color: inherit; /* アイコンの色を継承 */
-    z-index: 10; /* アイコンを手前に描画 */
+    font-size: 20px;
+    color: inherit;
 }
 </style>

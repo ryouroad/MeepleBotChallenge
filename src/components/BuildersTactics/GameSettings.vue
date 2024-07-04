@@ -16,6 +16,7 @@
                 </v-list-item-content>
             </v-list-item>
         </v-list>
+        <v-btn @click="fetchSettings" color="primary">ゲーム設定の取得</v-btn>
         <v-btn @click="updateSettings" color="primary">ゲーム設定の更新</v-btn>
         <v-btn @click="agree" color="primary">ゲーム設定に同意</v-btn>
         <v-btn @click="leave" color="primary">ゲームから退出</v-btn>
@@ -33,6 +34,10 @@ const emit = defineEmits(['update', 'agree', 'leave']);
 
 // props.settingsを元にローカルデータを作成
 const localSettings = reactive({ ...props.settings });
+
+const fetchSettings = () => {
+    emit('fetch');
+};
 
 const updateSettings = () => {
     emit('update', localSettings);

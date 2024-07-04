@@ -1,9 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useStore } from 'vuex';
 import { getBuilds, getPart } from './BuildersTacticsApi';
 
+const store = useStore();
+const selectedBuild = computed(() => store.getters['buildersTacticsStore/selectedBuild']);
 const builds = ref([]);
-const selectedBuild = ref(null);
 const parts = ref([]);
 
 const fetchBuilds = async () => {
@@ -25,7 +27,7 @@ const fetchPartsDetails = async (partsIds) => {
 };
 
 const selectBuild = async (build) => {
-  selectedBuild.value = build;
+  store.dispatch("buildersTacticsStore/setSelectedBuild", build);
   await fetchPartsDetails([
     build.head_id,
     build.core_id,
@@ -35,7 +37,7 @@ const selectBuild = async (build) => {
 };
 
 const goBack = () => {
-  selectedBuild.value = null;
+  store.dispatch("buildersTacticsStore/setSelectedBuild", null);
   parts.value = [];
 };
 

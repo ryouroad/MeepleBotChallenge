@@ -17,6 +17,7 @@ export const buildersTacticsStore = {
             field: null,
         },
         units: [],
+        selectedBuild: null,
     },
     mutations: {
         setCurrentGameId(state, gameId) {
@@ -31,16 +32,12 @@ export const buildersTacticsStore = {
         setField(state, field) {
             state.gameInfo.field = field;
         },
-        setUnitInfo(state, unit) {
-            const index = state.units.findIndex(u => u.unit_id === unit.unit_id);
-            if (index !== -1) {
-                // Update existing unit
-                state.units.splice(index, 1, unit);
-            } else {
-                // Add new unit
-                state.units.push(unit);
-            }
+        setUnits(state, units) {
+            state.units = units
         },
+        setSelectedBuild(state, build){
+            state.selectedBuild = build;
+        }
     },
     actions: {
         setCurrentGameId({ commit }, gameId) {
@@ -55,8 +52,11 @@ export const buildersTacticsStore = {
         setField({ commit }, field) {
             commit('setField', field);
         },
-        setUnitInfo({ commit }, unit) {
-            commit('setUnitInfo', unit);
+        setUnits({ commit }, units) {
+            commit('setUnits', units);
+        },
+        setSelectedBuild({ commit }, build) {
+            commit('setSelectedBuild', build);
         },
     },
     getters: {
@@ -66,5 +66,6 @@ export const buildersTacticsStore = {
         field: state => state.gameInfo.field,
         teamInfo: state => state.teamInfo,
         units: state => state.units,
+        selectedBuild: state => state.selectedBuild,
     },
 };

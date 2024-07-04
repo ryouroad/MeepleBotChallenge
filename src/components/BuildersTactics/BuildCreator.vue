@@ -14,7 +14,10 @@
               item-value="part_id" label="Select Leg"></v-select>
             <v-select v-model="newBuild.option_parts" :items="filteredParts('weapon')" item-title="parts_name"
               item-value="part_id" label="Select Option Parts" multiple></v-select>
-            <v-btn :disabled="!valid" @click="submit">Submit</v-btn>
+            <v-btn :disabled="!valid || loading" @click="submit">
+              <v-progress-circular v-if="loading" indeterminate size="24" class="mr-2"></v-progress-circular>
+              Submit
+            </v-btn>
           </v-form>
         </v-card>
       </v-container>
@@ -35,6 +38,7 @@ const newBuild = ref({
 });
 const parts = ref([]);
 const valid = ref(false);
+const loading = ref(false);
 
 const nameRules = [
   v => !!v || 'Name is required',
@@ -44,7 +48,6 @@ const nameRules = [
 const fetchParts = async () => {
   try {
     const data = await getParts();
-    // console.log('Fetched parts:', data);
     parts.value = data.parts;
   } catch (error) {
     console.error('Failed to fetch parts:', error);
@@ -57,6 +60,7 @@ const filteredParts = (type) => {
 
 const submit = async () => {
   if (valid.value) {
+    loading.value = true;
     try {
       await createBuild(newBuild.value);
       alert('Build created successfully!');
@@ -69,6 +73,8 @@ const submit = async () => {
       };
     } catch (error) {
       console.error('Failed to create build:', error);
+    } finally {
+      loading.value = false;
     }
   }
 };

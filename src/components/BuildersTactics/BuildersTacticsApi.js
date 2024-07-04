@@ -136,6 +136,17 @@ export const placeUnit = async (gameId, units) => {
 };
 
 // ユニット情報取得
+export const getUnits = async (gameId) => {
+  try {
+    const response = await apiClient.get(`/games/${gameId}/units`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching unit info for units in game ${gameId}:`, error);
+    throw error;
+  }
+};
+
+// ユニット情報取得
 export const getUnitInfo = async (gameId, unitId) => {
   try {
     const response = await apiClient.get(`/games/${gameId}/units/${unitId}`);

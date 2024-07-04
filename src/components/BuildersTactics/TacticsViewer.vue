@@ -10,9 +10,9 @@
             <v-card-text>
                 <PlayerInfo :teams="gameInfo.teams" />
                 <v-divider class="my-4"></v-divider>
-                <GameSettings v-if="gameInfo.status === 'setting'" :settings="gameInfo.setting" @update="updateGameSettings" @agree="handleAgreement" @leave="handleLeaveGame" />
+                <GameSettings v-if="gameInfo.status === 'setting'" :settings="gameInfo.setting" @fetch="fetchGameInfo" @update="updateGameSettings" @agree="handleAgreement" @leave="handleLeaveGame" />
                 <GameResults v-if="gameInfo.status === 'completed'" :winner="gameInfo.winner" />
-                <InGame v-if="gameInfo.status === 'in_game'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @fetchUnitInfo="fetchUnitInfo"/>
+                <InGame v-if="gameInfo.status === 'in_game'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @fetchUnits="fetchUnits"/>
             </v-card-text>
         </v-card>
     </v-container>
@@ -21,7 +21,7 @@
 <script setup>
 import { computed, onMounted, ref, onUnmounted, defineProps } from 'vue';
 import { useStore } from 'vuex';
-import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnitInfo } from './BuildersTacticsApi';
+import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnits } from './BuildersTacticsApi';
 import PlayerInfo from './PlayerInfo.vue';
 import GameSettings from './GameSettings.vue';
 import GameResults from './GameResults.vue';
@@ -57,18 +57,18 @@ const fetchBuilds = async () => {
     }
 };
 
-const fetchUnitInfo = async (unitId) => {
+const fetchUnits = async () => {
     try {
-        const unitInfoData = await getUnitInfo(currentGameId.value, unitId);
-        store.dispatch('buildersTacticsStore/setUnitInfo', unitInfoData);
+        const unitsInfo = await getUnits(currentGameId.value);
+        store.dispatch('buildersTacticsStore/setUnits', unitsInfo);
     } catch (error) {
         console.error('Error fetching game info:', error);
     }
 };
 
-const updateGameSettings = async () => {
+const updateGameSettings = async (setting) => {
     try {
-        await updateGameSetting(currentGameId.value, gameInfo.value.setting);
+        await updateGameSetting(currentGameId.value, setting);
     } catch (error) {
         console.error('Error updating game settings:', error);
     }
@@ -82,7 +82,6 @@ const handleAgreement = async () => {
         }
         const response = await proceedGame(currentGameId.value, param);
         store.dispatch('buildersTacticsStore/setGameInfo', response);
-        console.log('Game proceeded successfully');
     } catch (error) {
         console.error('Error proceeding game:', error);
     }
@@ -96,7 +95,6 @@ const handleSurrender = async () => {
         }
         const response = await proceedGame(currentGameId.value, param);
         store.dispatch('buildersTacticsStore/setGameInfo', response);
-        console.log('Game proceeded successfully');
     } catch (error) {
         console.error('Error proceeding game:', error);
     }
@@ -117,8 +115,9 @@ const completeUnitPlacement = async () => {
             field: gameInfo.value.field,
             agreement: "battle"
         };
-        const response = await placeUnit(currentGameId.value, fieldData);
-        console.log('Units placed successfully:', response);
+        const fieldInfo = await placeUnit(currentGameId.value, fieldData);
+        console.error(fieldInfo);
+        await fetchUnits(currentGameId.value);
     } catch (error) {
         console.error('Error placing units:', error);
     }
@@ -129,7 +128,7 @@ const intervalId = ref(null);
 onMounted(() => {
     fetchGameInfo();
     fetchBuilds();
-    fetchUnitInfo();
+    fetchUnits();
     intervalId.value = setInterval(fetchGameInfo, 300000);
 });
 
