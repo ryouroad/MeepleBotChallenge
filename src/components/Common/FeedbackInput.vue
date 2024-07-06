@@ -5,9 +5,27 @@
         <!-- ローディング中はインジケータを表示 -->
         <p v-if="isFeedbackLoading">送信中...</p>
         <!-- ローディングでないときはボタンを表示 -->
-        <v-text-field  v-else  v-model="input" @keyup.enter="send" placeholder="ご意見を入力してください。。。" min-width="400"/>
+        <v-text-field
+            v-else
+            v-model="input"
+            @keyup.enter="send"
+            placeholder="ご意見を入力してください。。。"
+            class="feedback-text-field"
+        />
     </div>
 </template>
+
+<style scoped>
+.Feedback-input {
+    width: 100%;
+}
+
+.feedback-text-field {
+    width: 100%;
+    min-width: 400px;
+}
+</style>
+
 
 <script>
 import { mapGetters, mapState } from 'vuex';

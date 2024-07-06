@@ -9,10 +9,16 @@
             </v-list-item-content>
         </v-list-item>
         <v-divider class="my-4"></v-divider>
-        <v-btn @click="fetchGameInfo" color="primary">フィールド更新</v-btn>
-        <v-btn v-if="gameInfo.phase !== 'initialize'" @click="surrender" color="primary">降参</v-btn>
+        <v-row id="menu-viewer" class="d-flex justify-center" cols="12">
+            <v-col cols="12" md="6" class="d-flex justify-center">
+                <v-btn @click="fetchGameInfo" color="primary">フィールド更新</v-btn>
+            </v-col>
+            <v-col cols="12" md="6" class="d-flex justify-center">
+                <v-btn v-if="gameInfo.phase === 'initialize'" @click="completePlacement" color="primary">ユニット配置完了</v-btn>
+                <v-btn v-if="gameInfo.phase !== 'initialize'" @click="surrender" color="primary">降参</v-btn>
+            </v-col>
+        </v-row>
         <TacticsField :field="gameInfo.field"/>
-        <v-btn v-if="gameInfo.phase === 'initialize'" @click="completePlacement" color="primary">ユニット配置完了</v-btn>
         <BuildViewer />
     </div>
 </template>
@@ -20,16 +26,14 @@
 <script setup>
 import { computed, defineEmits } from 'vue';
 import { useStore } from 'vuex';
-import TacticsField from './TacticsField.vue'; // ここを確認
-import BuildViewer from './BuildViewer.vue'; // ここを確認
+import TacticsField from './TacticsField.vue';
+import BuildViewer from './BuildViewer.vue';
 
 const store = useStore();
 const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 
-// Emitsの定義
 const emit = defineEmits(['completePlacement', 'fetchGameInfo', 'surrender']);
 
-// メソッドの定義
 const completePlacement = () => {
     emit('completePlacement');
 };

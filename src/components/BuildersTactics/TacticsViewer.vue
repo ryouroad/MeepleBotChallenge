@@ -10,16 +10,18 @@
             <v-card-text>
                 <PlayerInfo :teams="gameInfo.teams" />
                 <v-divider class="my-4"></v-divider>
-                <GameSettings v-if="gameInfo.status === 'setting'" :settings="gameInfo.setting" @fetch="fetchGameInfo" @update="updateGameSettings" @agree="handleAgreement" @leave="handleLeaveGame" />
+                <GameSettings :settings="gameInfo.setting" @fetch="fetchGameInfo" @update="updateGameSettings" @agree="handleAgreement" @leave="handleLeaveGame" />
+                <v-divider v-if="gameInfo.status !== 'setting'" class="my-4"></v-divider>
                 <GameResults v-if="gameInfo.status === 'completed'" :winner="gameInfo.winner" />
-                <InGame v-if="gameInfo.status === 'in_game'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @fetchUnits="fetchUnits"/>
+                <v-divider v-if="gameInfo.status === 'completed'" class="my-4"></v-divider>
+                <InGame v-if="gameInfo.status !== 'setting'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @fetchUnits="fetchUnits"/>
             </v-card-text>
         </v-card>
     </v-container>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, onUnmounted, defineProps } from 'vue';
+import { computed, onMounted, onUnmounted, defineProps } from 'vue';
 import { useStore } from 'vuex';
 import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnits } from './BuildersTacticsApi';
 import PlayerInfo from './PlayerInfo.vue';
@@ -123,17 +125,21 @@ const completeUnitPlacement = async () => {
     }
 };
 
-const intervalId = ref(null);
+const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+        fetchGameInfo();
+    }
+};
 
 onMounted(() => {
     fetchGameInfo();
     fetchBuilds();
     fetchUnits();
-    intervalId.value = setInterval(fetchGameInfo, 300000);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 });
 
 onUnmounted(() => {
-    clearInterval(intervalId.value);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
 });
 </script>
 

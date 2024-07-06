@@ -45,7 +45,7 @@
 
 <script setup>
 import meepleBotImage from '@/assets/MeepleBot/MeepleBotBoardGame.jpg';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import FeedbackInput from '@/components/Common/FeedbackInput.vue';
 import BuildViewer from './BuildViewer.vue';
@@ -56,6 +56,7 @@ import TacticsViewer from './TacticsViewer.vue';
 const store = useStore();
 const screen = ref('menu');
 
+const currentGameId = computed(() => store.getters['buildersTacticsStore/currentGameId'])
 const isBuildsScreen = computed(() => screen.value === 'builds');
 const isGamesScreen = computed(() => screen.value === 'games');
 const isTacticsScreen = computed(() => screen.value === 'tactics');
@@ -80,6 +81,12 @@ const toGames = () => {
 const toTactics = () => {
   screen.value = 'tactics';
 };
+
+onMounted(() => {
+    if(currentGameId.value){
+      toTactics()
+    }
+});
 
 </script>
 
