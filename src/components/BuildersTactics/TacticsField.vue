@@ -16,6 +16,11 @@
                                     </v-icon>
                                 </v-img>
                             </div>
+                            <div v-if="cell.initial_area && !cell.unit && gameInfo.phase == 'initialize'" class="unit-container">
+                                <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle" class="icon-overlay">
+                                    {{ getTeamIcon(cell.initial_area) }}
+                                </v-icon>
+                            </div>
                         </v-card-title>
                     </v-card>
                 </div>
@@ -36,14 +41,17 @@ const builds = computed(() => store.getters['buildersTacticsStore/builds']);
 const units = computed(() => store.getters['buildersTacticsStore/units']);
 const teamInfo = computed(() => store.getters['buildersTacticsStore/teamInfo']);
 const selectedBuild = computed(() => store.getters['buildersTacticsStore/selectedBuild']);
+const player_id = computed(() => store.getters['authStore/getName']);
 
 const iconSize = ref(0);
 
 const selectCell = (rowIndex, cellIndex) => {
     const newField = JSON.parse(JSON.stringify(field.value));
     if (gameInfo.value.phase === 'initialize') {
-        newField[rowIndex][cellIndex].unit = selectedBuild.value?.build_id;
-        store.dispatch('buildersTacticsStore/setField', newField);
+        if (newField[rowIndex][cellIndex].initial_area == player_id.value){
+            newField[rowIndex][cellIndex].unit = selectedBuild.value?.build_id;
+            store.dispatch('buildersTacticsStore/setField', newField);
+        }
     } else {
         emit('fetchUnitInfo', field.value[rowIndex][cellIndex].unit);
     }
@@ -60,27 +68,31 @@ const getUnitImage = (unitId) => {
     }
 };
 
-const getTeamColor = (unitId) => {
-    const unit = units.value.find(u => u.unit_id === unitId);
+const getTeamColor = (Id) => {
+    var targetId = Id;
+    const unit = units.value.find(u => u.unit_id === Id);
     if (unit) {
-        for (let i = 0; i < gameInfo.value.teams.length; i++) {
-            const team = gameInfo.value.teams[i];
-            if (team.some(player => player.player_id === unit.owner_player)) {
-                return teamInfo.value.colors[i];
-            }
+        targetId = unit.owner_player
+    }
+    for (let i = 0; i < gameInfo.value.teams.length; i++) {
+        const team = gameInfo.value.teams[i];
+        if (team.some(player => player.player_id === targetId)) {
+            return teamInfo.value.colors[i];
         }
     }
     return 'transparent';
 };
 
-const getTeamIcon = (unitId) => {
-    const unit = units.value.find(u => u.unit_id === unitId);
+const getTeamIcon = (Id) => {
+    var targetId = Id;
+    const unit = units.value.find(u => u.unit_id === Id);
     if (unit) {
-        for (let i = 0; i < gameInfo.value.teams.length; i++) {
-            const team = gameInfo.value.teams[i];
-            if (team.some(player => player.player_id === unit.owner_player)) {
-                return teamInfo.value.icons[i];
-            }
+        targetId = unit.owner_player
+    }
+    for (let i = 0; i < gameInfo.value.teams.length; i++) {
+        const team = gameInfo.value.teams[i];
+        if (team.some(player => player.player_id === targetId)) {
+            return teamInfo.value.icons[i];
         }
     }
     return '';

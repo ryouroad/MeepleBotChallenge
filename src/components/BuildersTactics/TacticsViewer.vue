@@ -17,11 +17,25 @@
                 <InGame v-if="gameInfo.status !== 'setting'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @fetchUnits="fetchUnits"/>
             </v-card-text>
         </v-card>
+
+        <!-- Error Dialog -->
+        <v-dialog v-model="errorDialog" max-width="500px">
+            <v-card>
+                <v-card-title class="headline">エラー</v-card-title>
+                <v-card-text>
+                    {{ errorMessage }}
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" @click="closeErrorDialog">OK</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, defineProps } from 'vue';
+import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue';
 import { useStore } from 'vuex';
 import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnits } from './BuildersTacticsApi';
 import PlayerInfo from './PlayerInfo.vue';
@@ -38,6 +52,9 @@ const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 const currentGameId = computed(() => store.getters['buildersTacticsStore/currentGameId']);
 const playerId = computed(() => store.getters['authStore/getName']);
 const builds = computed(() => store.getters['buildersTacticsStore/builds']);
+
+const errorDialog = ref(false);
+const errorMessage = ref('');
 
 const fetchGameInfo = async () => {
     if (currentGameId.value && playerId.value) {
@@ -70,9 +87,12 @@ const fetchUnits = async () => {
 
 const updateGameSettings = async (setting) => {
     try {
-        await updateGameSetting(currentGameId.value, setting);
+        const response = await updateGameSetting(currentGameId.value, setting);
+        store.dispatch('buildersTacticsStore/setGameInfo', response);
     } catch (error) {
         console.error('Error updating game settings:', error);
+        errorMessage.value = 'ゲーム設定の更新中にエラーが発生しました。設定値が範囲外の可能性があります。もう一度お試しください。';
+        showErrorDialog();
     }
 };
 
@@ -129,6 +149,14 @@ const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
         fetchGameInfo();
     }
+};
+
+const showErrorDialog = () => {
+    errorDialog.value = true;
+};
+
+const closeErrorDialog = () => {
+    errorDialog.value = false;
 };
 
 onMounted(() => {

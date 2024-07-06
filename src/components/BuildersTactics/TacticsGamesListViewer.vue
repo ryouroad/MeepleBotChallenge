@@ -100,7 +100,7 @@ const getPlayerCount = (game) => {
 
 // 現在のユーザーが特定のゲームに参加しているかどうかをチェックするヘルパー関数
 const isCurrentUserInGame = (game) => {
-    return game.teams.some(team => team.some(player => player.player_id === currentUserId.value));
+    return (game.teams.some(team => team.some(player => player.player_id === currentUserId.value)) && game.status == 'setting');
 };
 
 onMounted(fetchGames);
