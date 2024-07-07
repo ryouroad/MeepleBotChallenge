@@ -3,11 +3,11 @@
         <div class="grid-container" :style="gridStyle">
             <div v-for="(row, rowIndex) in field" :key="rowIndex" class="grid-row">
                 <div v-for="(cell, cellIndex) in row" :key="cellIndex" class="grid-cell">
-                    <v-card class="pa-2 square-card" @click="selectCell(rowIndex, cellIndex)"
+                    <v-card :class="{'pa-2': true, 'square-card': true}" @click="selectCell(rowIndex, cellIndex)"
                         :style="{ borderColor: getTeamColor(cell.unit), borderWidth: '2px', borderStyle: 'solid' }">
                         <v-card-title>
                             <div v-if="cell.unit" class="unit-container">
-                                <v-img :src="getUnitImage(cell.unit)" alt="unit image" class="unit-image">
+                                <v-img :src="getUnitImage(cell.unit)" alt="unit image" :class="{'unit-image': true}">
                                     <v-icon :color="getTeamColor(cell.unit)" :style="iconStyle" class="team-icon-overlay">
                                         {{ getTeamIcon(cell.unit) }}
                                     </v-icon>
@@ -20,12 +20,12 @@
                                 </v-img>
                             </div>
                             <div v-if="cell.initial_area && !cell.unit && gameInfo.phase == 'initialize'" class="unit-container">
-                                <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle"
-                                    class="team-icon-overlay">
+                                <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle" class="team-icon-overlay">
                                     {{ getTeamIcon(cell.initial_area) }}
                                 </v-icon>
                             </div>
                         </v-card-title>
+                        <v-img v-if="canSelect(rowIndex, cellIndex)" :src="highlightImage" class="overlay"></v-img>
                     </v-card>
                 </div>
             </div>
@@ -74,6 +74,7 @@ const iconSize = ref(0);
 const targetCell = ref(null);
 const selectedPart = ref(null);
 const showPartsDialog = ref(false);
+const highlightImage = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="lightblue"/></svg>')
 
 const selectCell = (rowIndex, cellIndex) => {
     const newField = JSON.parse(JSON.stringify(field.value));
@@ -91,21 +92,25 @@ const selectCell = (rowIndex, cellIndex) => {
                     const build = builds.value.find(b => b.build_id === unit.build_id);
                     store.dispatch('buildersTacticsStore/setSelectedBuild', build)
                     emit('fetchParts')
-                    if(gameInfo.value.phase !== 'move' && unit.can_attack){
+                    if (gameInfo.value.phase !== 'move' && unit.can_attack) {
                         openPartsDialog(parts);
+                    } else if (gameInfo.value.phase === 'move') {
+                        selectedPart.value = parts.value.find(part => part.part_type === 'legs')
                     }
                 }
             } else if (selectedUnit.value == newField[rowIndex][cellIndex].unit) {
                 store.dispatch('buildersTacticsStore/setSelectedUnit', null)
                 selectedPart.value = null
             } else {
-                targetCell.value = {
-                    row: rowIndex,
-                    col: cellIndex
+                if(canSelect(rowIndex,cellIndex)){
+                    targetCell.value = {
+                        row: rowIndex,
+                        col: cellIndex
+                    }
+                    emit('action', { phase: gameInfo.value.phase, actionUnit: selectedUnit.value, target_cell: targetCell.value, part_id: selectedPart.value })
+                    targetCell.value = null
                 }
-                emit('action', { phase: gameInfo.value.phase, actionUnit: selectedUnit.value, target_cell: targetCell.value, part_id: selectedPart.value })
                 store.dispatch('buildersTacticsStore/setSelectedUnit', null)
-                targetCell.value = null
                 selectedPart.value = null
             }
         }
@@ -177,6 +182,31 @@ const getMoved = (Id) => {
     }
 };
 
+const canSelect = (row, col) => {
+    if(selectedUnit.value != null && selectedPart.value != null){
+        var unit_row = -1
+        var unit_col = -1
+        for (let i = 0; i < field.value.length; i++) {
+            for (let j = 0; j < field.value[i].length; j++) {
+                if (field.value[i][j].unit === selectedUnit.value) {
+                    unit_row = i;
+                    unit_col = j;
+                }
+            }
+        }
+        if(unit_row == -1 || unit_col == -1){
+            return false;
+        } else {
+            const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col)
+            const part = parts.value.find(part => part.part_id == selectedPart.value)
+            const range = gameInfo.value.phase == 'move' ? part.move_area : part.attack_area;
+            return distance <= range;
+        }
+    } else {
+        return false;
+    }
+};
+
 const gridStyle = computed(() => {
     const rows = field.value.length;
     const cols = field.value[0].length;
@@ -198,7 +228,7 @@ const calculateIconSize = () => {
     const cols = field.value[0].length;
     const gridWidth = document.querySelector('.grid-container').offsetWidth;
     const cellWidth = gridWidth / cols;
-    iconSize.value = cellWidth * 0.4; // アイコンのサイズをセルの幅の40%に設定
+    iconSize.value = cellWidth * 0.4;
 };
 
 const closePartsDialog = () => {
@@ -216,7 +246,6 @@ const selectPart = (part) => {
 
 const filteredParts = () => {
     const filteredParts = parts.value.filter(part => part.part_type === 'weapon')
-    console.error(filteredParts);
     return filteredParts;
 };
 
@@ -304,5 +333,9 @@ onUnmounted(() => {
     right: 0;
     opacity: 0.8;
     color: inherit;
+}
+
+.overlay {
+    opacity: 0.4;
 }
 </style>
