@@ -3,29 +3,38 @@
         <div class="grid-container" :style="gridStyle">
             <div v-for="(row, rowIndex) in field" :key="rowIndex" class="grid-row">
                 <div v-for="(cell, cellIndex) in row" :key="cellIndex" class="grid-cell">
-                    <v-card :class="{'pa-2': true, 'square-card': true}" @click="selectCell(rowIndex, cellIndex)"
+                    <v-card v-bind="attrs" v-on="on" :class="{ 'pa-2': true, 'square-card': true }"
+                        @click="selectCell(rowIndex, cellIndex)"
                         :style="{ borderColor: getTeamColor(cell.unit), borderWidth: '2px', borderStyle: 'solid' }">
                         <v-card-title>
                             <div v-if="cell.unit" class="unit-container">
-                                <v-img :src="getUnitImage(cell.unit)" alt="unit image" :class="{'unit-image': true}">
-                                    <v-icon :color="getTeamColor(cell.unit)" :style="iconStyle" class="team-icon-overlay">
+                                <v-img :src="getUnitImage(cell.unit)" alt="unit image" :class="{ 'unit-image': true }">
+                                    <v-icon :color="getTeamColor(cell.unit)" :style="iconStyle"
+                                        class="team-icon-overlay">
                                         {{ getTeamIcon(cell.unit) }}
                                     </v-icon>
-                                    <v-icon v-if="!getAttacked(cell.unit)" :color="getTeamColor(cell.unit)" :style="iconStyle" class="attacked-icon-overlay">
+                                    <v-icon v-if="!getAttacked(cell.unit)" :color="getTeamColor(cell.unit)"
+                                        :style="iconStyle" class="attacked-icon-overlay">
                                         mdi-sword-cross
                                     </v-icon>
-                                    <v-icon v-if="!getMoved(cell.unit)" :color="getTeamColor(cell.unit)" :style="iconStyle" class="moved-icon-overlay">
+                                    <v-icon v-if="!getMoved(cell.unit)" :color="getTeamColor(cell.unit)"
+                                        :style="iconStyle" class="moved-icon-overlay">
                                         mdi-shoe-print
                                     </v-icon>
                                 </v-img>
                             </div>
-                            <div v-if="cell.initial_area && !cell.unit && gameInfo.phase == 'initialize'" class="unit-container">
-                                <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle" class="team-icon-overlay">
+                            <div v-if="cell.initial_area && !cell.unit && gameInfo.phase == 'initialize'"
+                                class="unit-container">
+                                <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle"
+                                    class="team-icon-overlay">
                                     {{ getTeamIcon(cell.initial_area) }}
                                 </v-icon>
                             </div>
                         </v-card-title>
                         <v-img v-if="canSelect(rowIndex, cellIndex)" :src="highlightImage" class="overlay"></v-img>
+                        <v-tooltip bottom activator=parent>
+                            <span>{{ getUnitInfo(cell.unit) }}</span>
+                        </v-tooltip>
                     </v-card>
                 </div>
             </div>
@@ -102,7 +111,7 @@ const selectCell = (rowIndex, cellIndex) => {
                 store.dispatch('buildersTacticsStore/setSelectedUnit', null)
                 selectedPart.value = null
             } else {
-                if(canSelect(rowIndex,cellIndex)){
+                if (canSelect(rowIndex, cellIndex)) {
                     targetCell.value = {
                         row: rowIndex,
                         col: cellIndex
@@ -114,6 +123,15 @@ const selectCell = (rowIndex, cellIndex) => {
                 selectedPart.value = null
             }
         }
+    }
+};
+
+const getUnitInfo = (unitId) => {
+    const unit = units.value.find(u => u.unit_id === unitId);
+    if (unit){
+        return "HP:"+unit.hp;
+    } else {
+        return "No unit";
     }
 };
 
@@ -163,7 +181,7 @@ const getAttacked = (Id) => {
     if (unit) {
         return unit.can_attack;
     }
-    if (gameInfo.value.phase == 'initialize'){
+    if (gameInfo.value.phase == 'initialize') {
         return true;
     } else {
         return false;
@@ -175,7 +193,7 @@ const getMoved = (Id) => {
     if (unit) {
         return unit.can_move;
     }
-    if (gameInfo.value.phase == 'initialize'){
+    if (gameInfo.value.phase == 'initialize') {
         return true;
     } else {
         return false;
@@ -183,7 +201,7 @@ const getMoved = (Id) => {
 };
 
 const canSelect = (row, col) => {
-    if(selectedUnit.value != null && selectedPart.value != null){
+    if (selectedUnit.value != null && selectedPart.value != null) {
         var unit_row = -1
         var unit_col = -1
         for (let i = 0; i < field.value.length; i++) {
@@ -194,7 +212,7 @@ const canSelect = (row, col) => {
                 }
             }
         }
-        if(unit_row == -1 || unit_col == -1){
+        if (unit_row == -1 || unit_col == -1) {
             return false;
         } else {
             const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col)

@@ -36,7 +36,7 @@
             <v-list-item>
                 <v-list-item-content>
                     <v-select v-model="gameInfo.setting.rule" :items="['normal']" label="ルール"></v-select>
-                    <v-select v-model="gameInfo.setting.player_order" :items="['random']" label="プレイヤー順"></v-select>
+                    <v-select v-model="gameInfo.setting.player_order" :items="['fix']" label="プレイヤー順"></v-select>
                     <v-select v-model="gameInfo.setting.initial_area" :items="['normal']" label="初期エリア"></v-select>
                     <v-text-field v-model="gameInfo.setting.player_number" label="プレイヤー数" type="number" min="2" max="2"></v-text-field>
                     <v-text-field v-model="gameInfo.setting.team_number" label="チーム数" type="number" min="2" max="2"></v-text-field>
