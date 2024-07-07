@@ -156,10 +156,10 @@ const unitAction = async (actionDetail) => {
             response = await postAttack(currentGameId.value, actionDetail.actionUnit, actionDetail)
         }
         store.dispatch('buildersTacticsStore/setGameInfo', response);
-        await fetchUnits();
     } catch (error){
         console.error('Error action unit:', error);
     }
+    await fetchGameInfo();
 }
 
 const fetchPartsDetails = async (partsIds) => {
