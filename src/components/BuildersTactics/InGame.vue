@@ -18,7 +18,7 @@
                 <v-btn v-if="gameInfo.phase !== 'initialize'" @click="surrender" color="primary">降参</v-btn>
             </v-col>
         </v-row>
-        <TacticsField :field="gameInfo.field"/>
+        <TacticsField :field="gameInfo.field" @action="unitAction" @fetchParts="fetchParts"/>
         <BuildViewer />
     </div>
 </template>
@@ -32,7 +32,7 @@ import BuildViewer from './BuildViewer.vue';
 const store = useStore();
 const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 
-const emit = defineEmits(['completePlacement', 'fetchGameInfo', 'surrender']);
+const emit = defineEmits(['completePlacement', 'fetchGameInfo', 'surrender', 'unitAction', 'fetchParts']);
 
 const completePlacement = () => {
     emit('completePlacement');
@@ -44,5 +44,13 @@ const fetchGameInfo = () => {
 
 const surrender = () => {
     emit('surrender');
+};
+
+const unitAction = (actionDetail) => {
+    emit('unitAction', actionDetail);
+};
+
+const fetchParts = () => {
+    emit('fetchParts', );
 };
 </script>

@@ -158,7 +158,7 @@ export const getUnitInfo = async (gameId, unitId) => {
 };
 
 // ムーブ
-export const moveUnit = async (gameId, unitId, newPosition) => {
+export const postMove = async (gameId, unitId, newPosition) => {
   try {
     const response = await apiClient.post(`/games/${gameId}/units/${unitId}/move`, { new_position: newPosition });
     return response.data;
@@ -169,7 +169,7 @@ export const moveUnit = async (gameId, unitId, newPosition) => {
 };
 
 // アタック
-export const attack = async (gameId, unitId, attackDetails) => {
+export const postAttack = async (gameId, unitId, attackDetails) => {
   try {
     const response = await apiClient.post(`/games/${gameId}/units/${unitId}/attack`, attackDetails);
     return response.data;

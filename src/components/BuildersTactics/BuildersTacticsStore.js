@@ -18,6 +18,8 @@ export const buildersTacticsStore = {
         },
         units: [],
         selectedBuild: null,
+        parts: [],
+        selectedUnit: null,
     },
     mutations: {
         setCurrentGameId(state, gameId) {
@@ -37,6 +39,12 @@ export const buildersTacticsStore = {
         },
         setSelectedBuild(state, build){
             state.selectedBuild = build;
+        },
+        setParts(state, parts) {
+            state.parts = parts
+        },
+        setSelectedUnit(state, unit){
+            state.selectedUnit = unit;
         }
     },
     actions: {
@@ -58,6 +66,12 @@ export const buildersTacticsStore = {
         setSelectedBuild({ commit }, build) {
             commit('setSelectedBuild', build);
         },
+        setParts({ commit }, parts) {
+            commit('setParts', parts);
+        },
+        setSelectedUnit({ commit }, unit) {
+            commit('setSelectedUnit', unit);
+        },
     },
     getters: {
         currentGameId: state => state.currentGameId,
@@ -67,5 +81,7 @@ export const buildersTacticsStore = {
         teamInfo: state => state.teamInfo,
         units: state => state.units,
         selectedBuild: state => state.selectedBuild,
+        parts: state => state.parts,
+        selectedUnit: state => state.selectedUnit,
     },
 };

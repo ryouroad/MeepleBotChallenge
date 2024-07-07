@@ -92,7 +92,6 @@ onMounted(() => {
 
 <style scoped>
 #builders-tactics-viewer {
-  max-width: 1200px;
   margin: auto;
 }
 </style>

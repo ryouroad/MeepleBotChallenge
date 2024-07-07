@@ -14,7 +14,7 @@
                 <v-divider v-if="gameInfo.status !== 'setting'" class="my-4"></v-divider>
                 <GameResults v-if="gameInfo.status === 'completed'" :winner="gameInfo.winner" />
                 <v-divider v-if="gameInfo.status === 'completed'" class="my-4"></v-divider>
-                <InGame v-if="gameInfo.status !== 'setting'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @fetchUnits="fetchUnits"/>
+                <InGame v-if="gameInfo.status !== 'setting'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @unitAction="unitAction" @fetchParts="fetchParts"/>
             </v-card-text>
         </v-card>
 
@@ -37,7 +37,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue';
 import { useStore } from 'vuex';
-import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnits } from './BuildersTacticsApi';
+import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnits, postMove, postAttack, getPart } from './BuildersTacticsApi';
 import PlayerInfo from './PlayerInfo.vue';
 import GameSettings from './GameSettings.vue';
 import GameResults from './GameResults.vue';
@@ -52,6 +52,7 @@ const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 const currentGameId = computed(() => store.getters['buildersTacticsStore/currentGameId']);
 const playerId = computed(() => store.getters['authStore/getName']);
 const builds = computed(() => store.getters['buildersTacticsStore/builds']);
+const selectedBuild = computed(() => store.getters['buildersTacticsStore/selectedBuild']);
 
 const errorDialog = ref(false);
 const errorMessage = ref('');
@@ -61,6 +62,7 @@ const fetchGameInfo = async () => {
         try {
             const gameInfoData = await getPlayerGame(currentGameId.value, playerId.value);
             store.dispatch('buildersTacticsStore/setGameInfo', gameInfoData);
+            await fetchUnits();
         } catch (error) {
             console.error('Error fetching game info:', error);
         }
@@ -139,10 +141,45 @@ const completeUnitPlacement = async () => {
         };
         const fieldInfo = await placeUnit(currentGameId.value, fieldData);
         console.error(fieldInfo);
-        await fetchUnits(currentGameId.value);
+        await fetchGameInfo();
     } catch (error) {
         console.error('Error placing units:', error);
     }
+};
+
+const unitAction = async (actionDetail) => {
+    try {
+        var response = null;
+        if (actionDetail.phase == "move"){
+            response = await postMove(currentGameId.value, actionDetail.actionUnit, actionDetail.target)
+        }else{
+            response = await postAttack(currentGameId.value, actionDetail.actionUnit, actionDetail)
+        }
+        store.dispatch('buildersTacticsStore/setGameInfo', response);
+        await fetchUnits();
+    } catch (error){
+        console.error('Error action unit:', error);
+    }
+}
+
+const fetchPartsDetails = async (partsIds) => {
+  try {
+    const partsDetails = await Promise.all(partsIds.map(partId => getPart(partId)));
+    store.dispatch('buildersTacticsStore/setParts',partsDetails.map(response => response));
+  } catch (error) {
+    console.error('Failed to fetch parts details:', error);
+  }
+};
+
+const fetchParts = async () => {
+    const build = selectedBuild.value
+    await fetchPartsDetails([
+        build.head_id,
+        build.core_id,
+        build.leg_id,
+        ...build.option_parts
+    ]);
+
 };
 
 const handleVisibilityChange = () => {
