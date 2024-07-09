@@ -3,39 +3,40 @@
         <div class="grid-container" :style="gridStyle">
             <div v-for="(row, rowIndex) in field" :key="rowIndex" class="grid-row">
                 <div v-for="(cell, cellIndex) in row" :key="cellIndex" class="grid-cell">
-                    <v-card v-bind="attrs" v-on="on" :class="{ 'pa-2': true, 'square-card': true }"
-                        @click="selectCell(rowIndex, cellIndex)"
-                        :style="{ borderColor: getTeamColor(cell.unit), borderWidth: '2px', borderStyle: 'solid' }">
-                        <v-card-title>
-                            <div v-if="cell.unit" class="unit-container">
-                                <v-img :src="getUnitImage(cell.unit)" alt="unit image" :class="{ 'unit-image': true }">
-                                    <v-icon :color="getTeamColor(cell.unit)" :style="iconStyle"
-                                        class="team-icon-overlay">
-                                        {{ getTeamIcon(cell.unit) }}
-                                    </v-icon>
-                                    <v-icon v-if="!getAttacked(cell.unit)" :color="getTeamColor(cell.unit)"
-                                        :style="iconStyle" class="attacked-icon-overlay">
-                                        mdi-sword-cross
-                                    </v-icon>
-                                    <v-icon v-if="!getMoved(cell.unit)" :color="getTeamColor(cell.unit)"
-                                        :style="iconStyle" class="moved-icon-overlay">
-                                        mdi-shoe-print
-                                    </v-icon>
-                                </v-img>
-                            </div>
-                            <div v-if="cell.initial_area && !cell.unit && gameInfo.phase == 'initialize'"
-                                class="unit-container">
-                                <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle"
-                                    class="team-icon-overlay">
-                                    {{ getTeamIcon(cell.initial_area) }}
-                                </v-icon>
-                            </div>
-                        </v-card-title>
-                        <v-img v-if="canSelect(rowIndex, cellIndex)" :src="highlightImage" class="overlay"></v-img>
-                        <v-tooltip bottom activator=parent>
-                            <span>{{ getUnitInfo(cell.unit) }}</span>
-                        </v-tooltip>
-                    </v-card>
+                    <v-tooltip bottom open-on-focus="false" open-on-hover="true" open-on-click="true">
+                        <template v-slot:activator="{ props }">
+                            <v-card v-bind="props" :class="{ 'pa-2': true, 'square-card': true }" @click="selectCell(rowIndex, cellIndex)"
+                                :style="{ borderColor: getTeamColor(cell.unit), borderWidth: '2px', borderStyle: 'solid' }">
+                                <v-card-title>
+                                    <div v-if="cell.unit" class="unit-container">
+                                        <v-img :src="getUnitImage(cell.unit)" alt="unit image" :class="{ 'unit-image': true }">
+                                            <v-icon :color="getTeamColor(cell.unit)" :style="iconStyle"
+                                                class="team-icon-overlay">
+                                                {{ getTeamIcon(cell.unit) }}
+                                            </v-icon>
+                                            <v-icon v-if="!getAttacked(cell.unit)" :color="getTeamColor(cell.unit)"
+                                                :style="iconStyle" class="attacked-icon-overlay">
+                                                mdi-sword-cross
+                                            </v-icon>
+                                            <v-icon v-if="!getMoved(cell.unit)" :color="getTeamColor(cell.unit)"
+                                                :style="iconStyle" class="moved-icon-overlay">
+                                                mdi-shoe-print
+                                            </v-icon>
+                                        </v-img>
+                                    </div>
+                                    <div v-if="cell.initial_area && !cell.unit && gameInfo.phase == 'initialize'"
+                                        class="unit-container">
+                                        <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle"
+                                            class="team-icon-overlay">
+                                            {{ getTeamIcon(cell.initial_area) }}
+                                        </v-icon>
+                                    </div>
+                                </v-card-title>
+                                <v-img v-if="canSelect(rowIndex, cellIndex)" :src="highlightImage" class="overlay"></v-img>
+                            </v-card>
+                        </template>
+                        <span>{{ getUnitInfo(cell.unit) }}</span>
+                    </v-tooltip>
                 </div>
             </div>
         </div>
@@ -88,7 +89,8 @@ const highlightImage = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://w
 const selectCell = (rowIndex, cellIndex) => {
     const newField = JSON.parse(JSON.stringify(field.value));
     if (gameInfo.value.status === 'in_game') {
-        if (gameInfo.value.phase === 'initialize') {
+        const player = gameInfo.value.teams.flat().find(player => player.player_id === player_id.value);
+        if (gameInfo.value.phase === 'initialize' && player.agreement === 'agree') {
             if (newField[rowIndex][cellIndex].initial_area == player_id.value && selectedBuild.value) {
                 newField[rowIndex][cellIndex].unit = selectedBuild.value.build_id;
                 store.dispatch('buildersTacticsStore/setField', newField);
@@ -131,7 +133,7 @@ const getUnitInfo = (unitId) => {
     if (unit){
         return "HP:"+unit.hp;
     } else {
-        return "No unit";
+        return "No your unit";
     }
 };
 
