@@ -49,7 +49,7 @@
         </v-list>
         <v-row v-if="gameInfo.status === 'setting'" id="menu-viewer" class="d-flex justify-center" cols="12">
             <v-col cols="12" md="3" class="d-flex justify-center">
-                <v-btn @click="fetchSettings" color="primary">ゲーム設定の取得</v-btn>
+                <v-btn @click="fetchSettings" color="primary">ゲーム情報の取得</v-btn>
             </v-col>
             <v-col cols="12" md="3" class="d-flex justify-center">
                 <v-btn @click="updateSettings" color="primary">ゲーム設定の更新</v-btn>

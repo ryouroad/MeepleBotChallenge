@@ -3,7 +3,7 @@
         <div class="grid-container" :style="gridStyle">
             <div v-for="(row, rowIndex) in field" :key="rowIndex" class="grid-row">
                 <div v-for="(cell, cellIndex) in row" :key="cellIndex" class="grid-cell">
-                    <v-tooltip bottom open-on-focus="false" open-on-hover="true" open-on-click="true">
+                    <v-tooltip bottom :open-on-focus=false :open-on-hover=true :open-on-click=true>
                         <template v-slot:activator="{ props }">
                             <v-card v-bind="props" :class="{ 'pa-2': true, 'square-card': true }" @click="selectCell(rowIndex, cellIndex)"
                                 :style="{ borderColor: getTeamColor(cell.unit), borderWidth: '2px', borderStyle: 'solid' }">
@@ -105,8 +105,8 @@ const selectCell = (rowIndex, cellIndex) => {
                     emit('fetchParts')
                     if (gameInfo.value.phase !== 'move' && unit.can_attack) {
                         openPartsDialog(parts);
-                    } else if (gameInfo.value.phase === 'move') {
-                        selectedPart.value = parts.value.find(part => part.part_type === 'legs')
+                    } else if (gameInfo.value.phase === 'move' && unit.can_attack && unit.can_move) {
+                        selectedPart.value = parts.value.find(part => part.part_type === 'legs').part_id
                     }
                 }
             } else if (selectedUnit.value == newField[rowIndex][cellIndex].unit) {
@@ -140,8 +140,12 @@ const getUnitInfo = (unitId) => {
 const getUnitImage = (unitId) => {
     const unit = units.value.find(u => u.unit_id === unitId);
     if (unit) {
-        const build = builds.value.find(b => b.build_id === unit.build_id);
-        return build ? build.build_image_url : '';
+        if (unit.is_exist){
+            const build = builds.value.find(b => b.build_id === unit.build_id);
+            return build ? build.build_image_url : '';
+        } else {
+            return '';
+        }
     } else {
         const build = builds.value.find(b => b.build_id === unitId);
         return build ? build.build_image_url : '';
@@ -153,6 +157,7 @@ const getTeamColor = (Id) => {
     const unit = units.value.find(u => u.unit_id === Id);
     if (unit) {
         targetId = unit.owner_player
+        if (!unit.is_exist) return 'transparent';
     }
     for (let i = 0; i < gameInfo.value.teams.length; i++) {
         const team = gameInfo.value.teams[i];
@@ -168,6 +173,7 @@ const getTeamIcon = (Id) => {
     const unit = units.value.find(u => u.unit_id === Id);
     if (unit) {
         targetId = unit.owner_player
+        if (!unit.is_exist) return '';
     }
     for (let i = 0; i < gameInfo.value.teams.length; i++) {
         const team = gameInfo.value.teams[i];
@@ -181,6 +187,7 @@ const getTeamIcon = (Id) => {
 const getAttacked = (Id) => {
     const unit = units.value.find(u => u.unit_id === Id);
     if (unit) {
+        if (!unit.is_exist) return false;
         return unit.can_attack;
     }
     if (gameInfo.value.phase == 'initialize') {
@@ -193,6 +200,7 @@ const getAttacked = (Id) => {
 const getMoved = (Id) => {
     const unit = units.value.find(u => u.unit_id === Id);
     if (unit) {
+        if (!unit.is_exist) return false;
         return unit.can_move;
     }
     if (gameInfo.value.phase == 'initialize') {
@@ -203,7 +211,7 @@ const getMoved = (Id) => {
 };
 
 const canSelect = (row, col) => {
-    if (selectedUnit.value != null && selectedPart.value != null) {
+    if (selectedUnit.value != null && selectedPart.value != null && gameInfo.value.phase_player == player_id.value) {
         var unit_row = -1
         var unit_col = -1
         for (let i = 0; i < field.value.length; i++) {
@@ -214,13 +222,15 @@ const canSelect = (row, col) => {
                 }
             }
         }
+        const part = parts.value.find(part => part.part_id == selectedPart.value);
         if (unit_row == -1 || unit_col == -1) {
             return false;
+        } else if ( (part.part_type == 'legs' && gameInfo.value.phase == 'move') || (part.part_type == 'weapon' && gameInfo.value.phase != 'move') ) {
+                const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col);
+                const range = gameInfo.value.phase == 'move' ? part.move_area : part.attack_area;
+                return distance <= range;
         } else {
-            const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col)
-            const part = parts.value.find(part => part.part_id == selectedPart.value)
-            const range = gameInfo.value.phase == 'move' ? part.move_area : part.attack_area;
-            return distance <= range;
+            return false;
         }
     } else {
         return false;

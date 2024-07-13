@@ -14,7 +14,7 @@
                 <v-divider v-if="gameInfo.status !== 'setting'" class="my-4"></v-divider>
                 <GameResults v-if="gameInfo.status === 'completed'" :winner="gameInfo.winner" />
                 <v-divider v-if="gameInfo.status === 'completed'" class="my-4"></v-divider>
-                <InGame v-if="gameInfo.status !== 'setting'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @unitAction="unitAction" @fetchParts="fetchParts"/>
+                <InGame v-if="gameInfo.status !== 'setting'" :gameInfo="gameInfo" :builds="builds" @completePlacement="completeUnitPlacement" @fetchGameInfo="fetchGameInfo" @surrender="handleSurrender" @unitAction="unitAction" @fetchParts="fetchParts" @nextPhase="nextPhase" />
             </v-card-text>
         </v-card>
 
@@ -37,7 +37,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, defineProps } from 'vue';
 import { useStore } from 'vuex';
-import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnits, postMove, postAttack, getPart } from './BuildersTacticsApi';
+import { getPlayerGame, leaveGame, updateGameSetting, proceedGame, getBuilds, placeUnit, getUnits, postMove, postAttack, getPart, proceedPhase } from './BuildersTacticsApi';
 import PlayerInfo from './PlayerInfo.vue';
 import GameSettings from './GameSettings.vue';
 import GameResults from './GameResults.vue';
@@ -63,6 +63,17 @@ const fetchGameInfo = async () => {
             const gameInfoData = await getPlayerGame(currentGameId.value, playerId.value);
             store.dispatch('buildersTacticsStore/setGameInfo', gameInfoData);
             await fetchUnits();
+        } catch (error) {
+            console.error('Error fetching game info:', error);
+        }
+    }
+};
+
+const nextPhase = async () => {
+    if (currentGameId.value) {
+        try {
+            const gameInfoData = await proceedPhase(currentGameId.value, gameInfo.value.phase);
+            store.dispatch('buildersTacticsStore/setGameInfo', gameInfoData);
         } catch (error) {
             console.error('Error fetching game info:', error);
         }

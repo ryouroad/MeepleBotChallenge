@@ -10,11 +10,14 @@
         </v-list-item>
         <v-divider class="my-4"></v-divider>
         <v-row id="menu-viewer" class="d-flex justify-center" cols="12">
-            <v-col cols="12" md="6" class="d-flex justify-center">
+            <v-col cols="12" md="4" class="d-flex justify-center">
                 <v-btn @click="fetchGameInfo" color="primary">フィールド更新</v-btn>
             </v-col>
-            <v-col cols="12" md="6" class="d-flex justify-center">
+            <v-col cols="12" md="4" class="d-flex justify-center">
                 <v-btn v-if="gameInfo.phase === 'initialize' && getAgreement() === 'agree'" @click="completePlacement" color="primary">ユニット配置完了</v-btn>
+                <v-btn v-if="gameInfo.phase !== 'initialize' && gameInfo.phase_player === playerId" @click="nextPhase" color="primary">フェイズ終了</v-btn>
+            </v-col>
+            <v-col cols="12" md="4" class="d-flex justify-center">
                 <v-btn v-if="gameInfo.phase !== 'initialize'" @click="surrender" color="primary">降参</v-btn>
             </v-col>
         </v-row>
@@ -33,10 +36,14 @@ const store = useStore();
 const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 const playerId = computed(() => store.getters['authStore/getName']);
 
-const emit = defineEmits(['completePlacement', 'fetchGameInfo', 'surrender', 'unitAction', 'fetchParts']);
+const emit = defineEmits(['completePlacement', 'nextPhase', 'fetchGameInfo', 'surrender', 'unitAction', 'fetchParts']);
 
 const completePlacement = () => {
     emit('completePlacement');
+};
+
+const nextPhase = () => {
+    emit('nextPhase');
 };
 
 const fetchGameInfo = () => {
