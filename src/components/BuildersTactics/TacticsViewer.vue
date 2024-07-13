@@ -162,7 +162,7 @@ const unitAction = async (actionDetail) => {
     try {
         var response = null;
         if (actionDetail.phase == "move"){
-            response = await postMove(currentGameId.value, actionDetail.actionUnit, actionDetail.target)
+            response = await postMove(currentGameId.value, actionDetail.actionUnit, actionDetail)
         }else{
             response = await postAttack(currentGameId.value, actionDetail.actionUnit, actionDetail)
         }

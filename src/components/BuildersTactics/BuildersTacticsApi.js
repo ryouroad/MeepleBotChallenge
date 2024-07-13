@@ -158,9 +158,9 @@ export const getUnitInfo = async (gameId, unitId) => {
 };
 
 // ムーブ
-export const postMove = async (gameId, unitId, newPosition) => {
+export const postMove = async (gameId, unitId, moveDetail) => {
   try {
-    const response = await apiClient.post(`/games/${gameId}/units/${unitId}/move`, { new_position: newPosition });
+    const response = await apiClient.post(`/games/${gameId}/units/${unitId}/move`, { target_cell: moveDetail.target_cell, part_id: moveDetail.part_id });
     return response.data;
   } catch (error) {
     console.error(`Error moving unit ${unitId} in game ${gameId}:`, error);

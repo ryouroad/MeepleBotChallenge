@@ -76,7 +76,7 @@ onMounted(fetchBuilds);
           <div v-for="build in builds" :key="build.build_id" @click="selectBuild(build)" class="build-card">
             <v-card>
               <v-img :src="build.build_image_url" :alt="build.build_name" contain></v-img>
-              <v-card-title>{{ build.build_name }}</v-card-title>
+              <v-card-title class="small_font">{{ build.build_name }}</v-card-title>
               <v-card-subtitle>HP: {{ build.max_hp }}</v-card-subtitle>
               <v-card-subtitle>Power: {{ build.total_power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ build.total_cost }}</v-card-subtitle>
@@ -101,10 +101,15 @@ onMounted(fetchBuilds);
   scrollbar-width: thin;
 }
 
+.small_font {
+  font-size: 16px;
+}
+
 .build-card {
   display: inline-block;
   cursor: pointer;
   flex: 0 0 auto;
+  width: 120px;
 }
 
 .build-image {
