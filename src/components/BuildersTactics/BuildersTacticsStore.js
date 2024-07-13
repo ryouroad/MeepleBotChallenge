@@ -14,6 +14,9 @@ export const buildersTacticsStore = {
             },
         ],
         gameInfo: {
+            setting: {
+                rule: 'normal',
+            },
             field: null,
         },
         units: [],

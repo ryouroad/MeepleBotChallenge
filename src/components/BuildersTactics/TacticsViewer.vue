@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container v-if="!isLoading">
         <v-card v-if="gameInfo" class="mt-5">
             <v-card-title>
                 <v-row justify="space-between">
@@ -56,6 +56,8 @@ const selectedBuild = computed(() => store.getters['buildersTacticsStore/selecte
 
 const errorDialog = ref(false);
 const errorMessage = ref('');
+const isLoading = ref(true);
+
 
 const fetchGameInfo = async () => {
     if (currentGameId.value && playerId.value) {
@@ -208,10 +210,12 @@ const closeErrorDialog = () => {
 };
 
 onMounted(() => {
+    isLoading.value = true;
     fetchGameInfo();
     fetchBuilds();
     fetchUnits();
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    isLoading.value = false;
 });
 
 onUnmounted(() => {
