@@ -2,8 +2,8 @@
     "name": "MeepleBotChallenge",
     "display": "standalone",
     "id": "MeepleBotChallenge", 
-    "scope": "/",
-    "start_url": "/",
+    "scope": "https://ryouroad.github.io/MeepleBotChallenge",
+    "start_url": "https://ryouroad.github.io/MeepleBotChallenge",
     "icons": [
         {
             "src": "favicon.ico",
