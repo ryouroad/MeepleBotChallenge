@@ -14,14 +14,23 @@
                 <v-btn @click="fetchGameInfo" color="primary">フィールド更新</v-btn>
             </v-col>
             <v-col cols="12" md="4" class="d-flex justify-center">
-                <v-btn v-if="gameInfo.phase === 'initialize' && getAgreement() === 'agree'" @click="completePlacement" color="primary">ユニット配置完了</v-btn>
+                <v-btn v-if="gameInfo.phase === 'initialize' && getAgreement() === 'agree'" @click="completePlacement" color="primary">
+                    ユニット配置完了
+                    <v-tooltip bottom activator="parent">
+                        <span v-if="!costOver && !buildOver">Are you ready?</span>
+                        <span v-if="costOver">Cost over! </span>
+                        <span v-if="buildOver">Build number over!</span>
+                    </v-tooltip>
+                </v-btn>
                 <v-btn v-if="gameInfo.phase !== 'initialize' && gameInfo.phase_player === playerId" @click="nextPhase" color="primary">フェイズ終了</v-btn>
             </v-col>
             <v-col cols="12" md="4" class="d-flex justify-center">
+                <v-text v-if="gameInfo.phase === 'initialize' && getAgreement() === 'agree'">コスト：{{ totalCost }}</v-text>
+                <v-text v-if="gameInfo.phase === 'initialize' && getAgreement() === 'agree'">ビルド数：{{ totalBuild }}</v-text>
                 <v-btn v-if="gameInfo.phase !== 'initialize'" @click="surrender" color="primary">降参</v-btn>
             </v-col>
         </v-row>
-        <TacticsField :field="gameInfo.field" @action="unitAction" @fetchParts="fetchParts"/>
+        <TacticsField :field="gameInfo.field" @action="unitAction" @fetchParts="fetchParts" />
         <BuildViewer />
     </div>
 </template>
@@ -35,11 +44,50 @@ import BuildViewer from './BuildViewer.vue';
 const store = useStore();
 const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 const playerId = computed(() => store.getters['authStore/getName']);
+const builds = computed(() => store.getters['buildersTacticsStore/builds']);
+const buildOver = computed(() => {
+    return (totalBuild.value > gameInfo.value.setting.max_build)
+}) ;
+const totalBuild = computed(() => {
+    let buildIds = [];
+
+    gameInfo.value.field.forEach(row => {
+        row.forEach(cell => {
+            const build = builds.value.find(b => b.build_id === cell.unit);
+            if (build) {
+                if (!buildIds.includes(build.build_id)) {
+                    buildIds.push(build.build_id);
+                }
+            }
+        });
+    });
+
+    return buildIds.length;
+});
+const costOver = computed(() => {
+    return (totalCost.value > gameInfo.value.setting.max_cost)
+}) ;
+const totalCost = computed(() => {
+    let costSum = 0;
+
+    gameInfo.value.field.forEach(row => {
+        row.forEach(cell => {
+            const build = builds.value.find(b => b.build_id === cell.unit);
+            if (build) {
+                costSum += build.total_cost;
+            }
+        });
+    });
+
+    return costSum;
+});
 
 const emit = defineEmits(['completePlacement', 'nextPhase', 'fetchGameInfo', 'surrender', 'unitAction', 'fetchParts']);
 
 const completePlacement = () => {
-    emit('completePlacement');
+    if(!costOver.value && !buildOver.value){
+        emit('completePlacement');
+    }
 };
 
 const nextPhase = () => {
@@ -59,11 +107,12 @@ const unitAction = (actionDetail) => {
 };
 
 const fetchParts = () => {
-    emit('fetchParts', );
+    emit('fetchParts',);
 };
 
 const getAgreement = () => {
     const player = gameInfo.value.teams.flat().find(player => player.player_id === playerId.value);
     return player?.agreement
 }
+
 </script>

@@ -213,7 +213,6 @@ onMounted(() => {
     isLoading.value = true;
     fetchGameInfo();
     fetchBuilds();
-    fetchUnits();
     document.addEventListener('visibilitychange', handleVisibilityChange);
     isLoading.value = false;
 });

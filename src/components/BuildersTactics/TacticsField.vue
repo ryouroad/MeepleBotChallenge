@@ -94,6 +94,9 @@ const selectCell = (rowIndex, cellIndex) => {
             if (newField[rowIndex][cellIndex].initial_area == player_id.value && selectedBuild.value) {
                 newField[rowIndex][cellIndex].unit = selectedBuild.value.build_id;
                 store.dispatch('buildersTacticsStore/setField', newField);
+            } else {
+                newField[rowIndex][cellIndex].unit = null;
+                store.dispatch('buildersTacticsStore/setField', newField);
             }
         } else if (gameInfo.value.phase !== 'initialize' && gameInfo.value.phase_player == player_id.value) {
             if (selectedUnit.value == null || selectedPart.value == null) {
@@ -131,7 +134,15 @@ const selectCell = (rowIndex, cellIndex) => {
 const getUnitInfo = (unitId) => {
     const unit = units.value.find(u => u.unit_id === unitId);
     if (unit){
-        return "HP:"+unit.hp;
+        const build = builds.value.find(b => b.build_id === unit.build_id);
+        return "HP:"+unit.hp+"\nCost:"+build.total_cost+"\nPower:"+build.total_power;
+    } else if(unitId != null) {
+        const build = builds.value.find(b => b.build_id === unitId);
+        if (build){
+            return "HP:"+build.max_hp+"\nCost:"+build.total_cost+"\nPower:"+build.total_power;
+        } else {
+            return "No your unit";
+        }
     } else {
         return "No your unit";
     }
