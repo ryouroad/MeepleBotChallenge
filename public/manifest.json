@@ -1,0 +1,14 @@
+{
+    "name": "MeepleBotChallenge",
+    "display": "standalone",
+    "start_url": "./index.html",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "type": "image/ico",
+            "sizes": "270x270"
+        }
+    ],
+    "background_color": "#FFFFFF",
+    "theme_color": "#4e342e"
+}
