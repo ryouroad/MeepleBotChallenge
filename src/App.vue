@@ -65,7 +65,7 @@
         <v-container>
           <v-alert v-if="getUserName" type="info">
             ようこそ{{ getUserName }}さん！一緒に楽しみましょう！
-            <v-btn v-if="notificationPermission" @click="allowWebPush">ゲームで自分のターンを知らせるPush通知を受け取る</v-btn>
+            <v-btn v-if="!notificationPermission" @click="allowWebPush">ゲームで自分のターンを知らせるPush通知を受け取る</v-btn>
           </v-alert>
           <v-alert v-else type="info">
             ようこそ！ログインして新ゲームの先行プレイやオリジナルゲームを一緒に楽しみましょう！
@@ -134,7 +134,7 @@ export default {
     });
     const notificationPermission = computed(() => {
       if ('Notification' in window) {
-        return Notification.permission;
+        return Notification.permission === 'granted';
       } else {
         return false;
       }
@@ -228,36 +228,28 @@ export default {
           return false;
         }
       }
-      const applicationServerKey = urlB64ToUint8Array(PUSH_PUBLIC_KEY);
 
-      // push managerにサーバーキーを渡し、トークンを取得
-      let subscription = undefined;
       try {
-        subscription = await window.sw.pushManager.subscribe({
+        const applicationServerKey = urlB64ToUint8Array(PUSH_PUBLIC_KEY);
+        const subscription = await window.sw.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey
         });
-      } catch (e) {
-        alert('Push通知機能が拒否されたか、エラーが発生しましたので、Push通知は送信されません。');
-        return false;
-      }
+        const key = btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('p256dh'))));
+        const token = btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth'))));
 
-      const key = subscription.getKey('p256dh');
-      const token = subscription.getKey('auth');
-
-      try {
-        await axios.post(`${SERVER_URL}/push/setting`, new URLSearchParams({
+        await axios.post(`${SERVER_URL}push/setting`, {
           endpoint: subscription.endpoint,
-          userPublicKey: btoa(String.fromCharCode.apply(null, new Uint8Array(key))),
-          userAuthToken: btoa(String.fromCharCode.apply(null, new Uint8Array(token)))
-        }), {
+          userPublicKey: key,
+          userAuthToken: token
+        }, {
           headers: {
             'x-api-key': API_KEY,
-            'Authorization': getIdToken,
+            'Authorization': getIdToken.value,
           }
         });
       } catch (error) {
-        console.error('Error fetching token:', error);
+        alert('Push通知機能が拒否されたか、エラーが発生しましたので、Push通知は送信されません。');
       }
     }
 
