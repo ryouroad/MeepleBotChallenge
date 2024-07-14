@@ -1,0 +1,14 @@
+{
+    "name": "MeepleBotChallenge",
+    "display": "standalone",
+    "id": "MeepleBotChallenge", 
+    "scope": "/",
+    "start_url": "/",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "type": "image/ico",
+            "sizes": "270x270"
+        }
+    ]
+}
