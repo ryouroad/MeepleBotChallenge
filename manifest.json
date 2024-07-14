@@ -1,14 +1,1 @@
-{
-    "name": "MeepleBotChallenge",
-    "display": "standalone",
-    "id": "MeepleBotChallenge", 
-    "scope": "https://ryouroad.github.io/MeepleBotChallenge",
-    "start_url": "https://ryouroad.github.io/MeepleBotChallenge",
-    "icons": [
-        {
-            "src": "favicon.ico",
-            "type": "image/ico",
-            "sizes": "270x270"
-        }
-    ]
-}
+{"name":"MeepleBotChallenge","short_name":"MeepleBotChallenge","theme_color":"#4e342e","icons":[{"src":"favicon.ico","type":"image/ico","sizes":"270x270"}],"start_url":"./index.html","display":"standalone","background_color":"#FFFFFF"}
