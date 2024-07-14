@@ -7,7 +7,7 @@
         <v-spacer></v-spacer>
         <v-btn text :href="twitterUrl">管理者Xアカウント</v-btn>
       </v-app-bar>
-      
+
       <v-navigation-drawer v-model="drawer" :permanent="isLargeScreen" app>
         <v-list dense>
           <v-list-item link :href="`${baseUrl}`">
@@ -60,18 +60,19 @@
 
         </v-list>
       </v-navigation-drawer>
-      
+
       <v-main>
         <v-container>
           <v-alert v-if="getUserName" type="info">
             ようこそ{{ getUserName }}さん！一緒に楽しみましょう！
+            <v-btn v-if="notificationPermission" @click="allowWebPush">ゲームで自分のターンを知らせるPush通知を受け取る</v-btn>
           </v-alert>
           <v-alert v-else type="info">
             ようこそ！ログインして新ゲームの先行プレイやオリジナルゲームを一緒に楽しみましょう！
           </v-alert>
           <router-view name="Main">
           </router-view>
-          
+
           <section id="contact">
             <v-card>
               <v-card-title>注意</v-card-title>
@@ -92,7 +93,7 @@
           </section>
         </v-container>
       </v-main>
-      
+
       <v-footer>
         <v-col class="text-center">
           <p>© 2024 ミープルボットの挑戦. All rights reserved.</p>
@@ -101,7 +102,6 @@
     </v-container>
   </v-app>
 </template>
-
 
 <script>
 import { useStore } from 'vuex';
@@ -112,6 +112,9 @@ const CLIENT_ID = process.env.VUE_APP_COGNITO_CLIENT_ID;
 const COGNITO_URL = process.env.VUE_APP_COGNITO_URL;
 const TWITTER_URL = process.env.VUE_APP_TWITTER_URL;
 const REDIRECT_URI = process.env.VUE_APP_BASE_URL;
+const PUSH_PUBLIC_KEY = process.env.VUE_APP_PUSH_PUBLIC_KEY;
+const SERVER_URL = process.env.VUE_APP_SERVER_URL;
+const API_KEY = process.env.VUE_APP_API_KEY;
 
 export default {
   name: 'App',
@@ -120,6 +123,7 @@ export default {
     const drawer = ref(true);
     const getUserName = computed(() => store.getters['authStore/getName']);
     const getUserToken = computed(() => store.getters['authStore/getRefreshToken']);
+    const getIdToken = computed(() => store.getters['authStore/getIdToken']);
     const baseUrl = process.env.BASE_URL;
     const loginUrl = `${COGNITO_URL}/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
     const logoutUrl = `${COGNITO_URL}/logout?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
@@ -128,12 +132,19 @@ export default {
     const isLargeScreen = computed(() => {
       return mdAndUp.value
     });
+    const notificationPermission = computed(() => {
+      if ('Notification' in window) {
+        return Notification.permission;
+      } else {
+        return false;
+      }
+    })
 
     const scrollToId = id => {
       const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
-      }else{
+      } else {
         this.$router.push('/');
       }
     };
@@ -193,6 +204,79 @@ export default {
       store.dispatch('authStore/removeToken');
     };
 
+    /**
+     * サービスワーカーの登録
+     */
+    self.addEventListener('load', async () => {
+      if ('serviceWorker' in navigator) {
+        window.sw = await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+      }
+    });
+
+    /**
+     * WebPushを許可する仕組み
+     */
+    async function allowWebPush() {
+      if ('Notification' in window) {
+        let permission = Notification.permission;
+
+        if (permission === 'denied') {
+          alert('Push通知が拒否されているようです。ブラウザの設定からPush通知を有効化してください');
+          return false;
+        } else if (permission === 'granted') {
+          alert('すでにWebPushを許可済みです');
+          return false;
+        }
+      }
+      const applicationServerKey = urlB64ToUint8Array(PUSH_PUBLIC_KEY);
+
+      // push managerにサーバーキーを渡し、トークンを取得
+      let subscription = undefined;
+      try {
+        subscription = await window.sw.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey
+        });
+      } catch (e) {
+        alert('Push通知機能が拒否されたか、エラーが発生しましたので、Push通知は送信されません。');
+        return false;
+      }
+
+      const key = subscription.getKey('p256dh');
+      const token = subscription.getKey('auth');
+
+      try {
+        await axios.post(`${SERVER_URL}/push/setting`, new URLSearchParams({
+          endpoint: subscription.endpoint,
+          userPublicKey: btoa(String.fromCharCode.apply(null, new Uint8Array(key))),
+          userAuthToken: btoa(String.fromCharCode.apply(null, new Uint8Array(token)))
+        }), {
+          headers: {
+            'x-api-key': API_KEY,
+            'Authorization': getIdToken,
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching token:', error);
+      }
+    }
+
+    function urlB64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+      const rawData = window.atob(base64);
+      const outputArray = new Uint8Array(rawData.length);
+
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    }
+
+
     // onMounted hook
     onMounted(() => {
       document.title = 'ミープルボットの挑戦';
@@ -209,6 +293,8 @@ export default {
       twitterUrl,
       scrollToId,
       removeToken,
+      notificationPermission,
+      allowWebPush,
     };
   }
 };
