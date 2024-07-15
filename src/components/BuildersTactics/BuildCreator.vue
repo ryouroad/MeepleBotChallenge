@@ -181,7 +181,7 @@ const submit = async () => {
         option_parts: []
       };
     } catch (error) {
-      console.error('Failed to create build:', error);
+      alert('Failed to create build.');
     } finally {
       loading.value = false;
     }

@@ -14,5 +14,12 @@ module.exports = {
   },
   css: {
     extract: true,
-  },    
+  },
+  pwa: {
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      swSrc: './src/service-worker.js', // 修正
+      swDest: 'service-worker.js' // 変更なし
+    }
+  }
 }

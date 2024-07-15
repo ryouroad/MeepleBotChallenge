@@ -209,7 +209,7 @@ export default {
      */
     self.addEventListener('load', async () => {
       if ('serviceWorker' in navigator) {
-        window.sw = await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+        window.sw = await navigator.serviceWorker.register('service-worker.js', { scope: '/MeepleBotChallenge/' });
       }
     });
 
@@ -248,7 +248,9 @@ export default {
             'Authorization': getIdToken.value,
           }
         });
+        alert('Push通知機能が登録完了しました。');
       } catch (error) {
+        console.error(error);
         alert('Push通知機能が拒否されたか、エラーが発生しましたので、Push通知は送信されません。');
       }
     }
