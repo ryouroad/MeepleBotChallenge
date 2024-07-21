@@ -236,10 +236,25 @@ const canSelect = (row, col) => {
         const part = parts.value.find(part => part.part_id == selectedPart.value);
         if (unit_row == -1 || unit_col == -1) {
             return false;
-        } else if ( (part.part_type == 'legs' && gameInfo.value.phase == 'move') || (part.part_type == 'weapon' && gameInfo.value.phase != 'move') ) {
-                const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col);
-                const range = gameInfo.value.phase == 'move' ? part.move_area : part.attack_area;
-                return distance <= range;
+        } else if(part.part_type == 'legs' && gameInfo.value.phase == 'move'){
+            let move_type_flag = false;
+            const move_y = Math.abs(row - unit_row);
+            const move_x = Math.abs(col - unit_col);
+            const distance = move_y + move_x;
+            const range = part.move_area;
+            if(part.move_type == 'cross'){
+                move_type_flag = (move_y == move_x);
+            }else if(part.move_type == 'straight'){
+                move_type_flag = (move_y == 0) || (move_x == 0);
+            }else if(part.move_type == 'free'){
+                move_type_flag = true;
+            }
+            return (distance <= range) && move_type_flag;
+
+        } else if(part.part_type == 'weapon' && gameInfo.value.phase != 'move') {
+            const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col);
+            const range = part.attack_area;
+            return distance <= range;
         } else {
             return false;
         }

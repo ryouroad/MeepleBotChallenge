@@ -192,7 +192,6 @@ const fetchParts = async () => {
         build.leg_id,
         ...build.option_parts
     ]);
-
 };
 
 const handleVisibilityChange = () => {
@@ -213,6 +212,7 @@ onMounted(() => {
     isLoading.value = true;
     fetchGameInfo();
     fetchBuilds();
+    fetchParts();
     document.addEventListener('visibilitychange', handleVisibilityChange);
     isLoading.value = false;
 });
