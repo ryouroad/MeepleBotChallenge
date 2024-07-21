@@ -86,7 +86,7 @@ const selectedPart = ref(null);
 const showPartsDialog = ref(false);
 const highlightImage = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="lightblue"/></svg>')
 
-const selectCell = (rowIndex, cellIndex) => {
+const selectCell = async(rowIndex, cellIndex) => {
     const newField = JSON.parse(JSON.stringify(field.value));
     if (gameInfo.value.status === 'in_game') {
         const player = gameInfo.value.teams.flat().find(player => player.player_id === player_id.value);
@@ -104,12 +104,22 @@ const selectCell = (rowIndex, cellIndex) => {
                     store.dispatch('buildersTacticsStore/setSelectedUnit', newField[rowIndex][cellIndex].unit)
                     const unit = units.value.find(u => u.unit_id === selectedUnit.value);
                     const build = builds.value.find(b => b.build_id === unit.build_id);
-                    store.dispatch('buildersTacticsStore/setSelectedBuild', build)
-                    emit('fetchParts')
+                    if (build != selectedBuild.value){
+                        store.dispatch('buildersTacticsStore/setSelectedBuild', build)
+                        const fetchParts = () => {
+                            return new Promise((resolve) => {
+                                emit('fetchParts', resolve);
+                            });
+                        };
+                        await fetchParts();
+                    }
                     if (gameInfo.value.phase !== 'move' && unit.can_attack) {
-                        openPartsDialog(parts);
+                        openPartsDialog(parts.value);
                     } else if (gameInfo.value.phase === 'move' && unit.can_attack && unit.can_move) {
-                        selectedPart.value = parts.value.find(part => part.part_type === 'legs').part_id
+                        const legPart = parts.value.find(part => part.part_type === 'legs');
+                        if (legPart) {
+                            selectedPart.value = legPart.part_id;
+                        }
                     }
                 }
             } else if (selectedUnit.value == newField[rowIndex][cellIndex].unit) {
@@ -223,39 +233,47 @@ const getMoved = (Id) => {
 
 const canSelect = (row, col) => {
     if (selectedUnit.value != null && selectedPart.value != null && gameInfo.value.phase_player == player_id.value) {
-        var unit_row = -1
-        var unit_col = -1
-        for (let i = 0; i < field.value.length; i++) {
-            for (let j = 0; j < field.value[i].length; j++) {
-                if (field.value[i][j].unit === selectedUnit.value) {
-                    unit_row = i;
-                    unit_col = j;
+        try{
+            var unit_row = -1
+            var unit_col = -1
+            for (let i = 0; i < field.value.length; i++) {
+                for (let j = 0; j < field.value[i].length; j++) {
+                    if (field.value[i][j].unit === selectedUnit.value) {
+                        unit_row = i;
+                        unit_col = j;
+                        break;
+                    }
                 }
+                if (unit_row !== -1 && unit_col !== -1) break;
             }
-        }
-        const part = parts.value.find(part => part.part_id == selectedPart.value);
-        if (unit_row == -1 || unit_col == -1) {
-            return false;
-        } else if(part.part_type == 'legs' && gameInfo.value.phase == 'move'){
-            let move_type_flag = false;
-            const move_y = Math.abs(row - unit_row);
-            const move_x = Math.abs(col - unit_col);
-            const distance = move_y + move_x;
-            const range = part.move_area;
-            if(part.move_type == 'cross'){
-                move_type_flag = (move_y == move_x);
-            }else if(part.move_type == 'straight'){
-                move_type_flag = (move_y == 0) || (move_x == 0);
-            }else if(part.move_type == 'free'){
-                move_type_flag = true;
+            const part = parts.value.find(part => part.part_id == selectedPart.value);
+            if (unit_row == -1 || unit_col == -1) {
+                return false;
+            } else if(part.part_type == 'legs' && gameInfo.value.phase == 'move'){
+                let move_type_flag = false;
+                const move_y = Math.abs(row - unit_row);
+                const move_x = Math.abs(col - unit_col);
+                const distance = move_y + move_x;
+                const range = part.move_area;
+                if(part.move_type == 'cross'){
+                    move_type_flag = (move_y == move_x);
+                }else if(part.move_type == 'straight'){
+                    move_type_flag = (move_y == 0) || (move_x == 0);
+                }else if(part.move_type == 'free'){
+                    move_type_flag = true;
+                }
+                return (distance <= range) && move_type_flag;
+    
+            } else if(part.part_type == 'weapon' && gameInfo.value.phase != 'move') {
+                const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col);
+                const range = part.attack_area;
+                return distance <= range;
+            } else {
+                return false;
             }
-            return (distance <= range) && move_type_flag;
-
-        } else if(part.part_type == 'weapon' && gameInfo.value.phase != 'move') {
-            const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col);
-            const range = part.attack_area;
-            return distance <= range;
-        } else {
+        }catch{
+            store.dispatch('buildersTacticsStore/setSelectedUnit', null)
+            selectedPart.value = null
             return false;
         }
     } else {

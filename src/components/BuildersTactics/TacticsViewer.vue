@@ -184,14 +184,17 @@ const fetchPartsDetails = async (partsIds) => {
   }
 };
 
-const fetchParts = async () => {
-    const build = selectedBuild.value
-    await fetchPartsDetails([
-        build.head_id,
-        build.core_id,
-        build.leg_id,
-        ...build.option_parts
-    ]);
+const fetchParts = async (resolve) => {
+    setTimeout(async() => {
+        const build = selectedBuild.value
+        await fetchPartsDetails([
+            build.head_id,
+            build.core_id,
+            build.leg_id,
+            ...build.option_parts
+        ]);
+        resolve(); // Promiseを解決
+    }, 1000);
 };
 
 const handleVisibilityChange = () => {
@@ -212,7 +215,6 @@ onMounted(() => {
     isLoading.value = true;
     fetchGameInfo();
     fetchBuilds();
-    fetchParts();
     document.addEventListener('visibilitychange', handleVisibilityChange);
     isLoading.value = false;
 });

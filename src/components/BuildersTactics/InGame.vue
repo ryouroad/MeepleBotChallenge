@@ -106,8 +106,8 @@ const unitAction = (actionDetail) => {
     emit('unitAction', actionDetail);
 };
 
-const fetchParts = () => {
-    emit('fetchParts',);
+const fetchParts = (resolve) => {
+    emit('fetchParts',resolve);
 };
 
 const getAgreement = () => {
