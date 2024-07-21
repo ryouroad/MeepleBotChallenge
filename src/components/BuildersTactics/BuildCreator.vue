@@ -12,7 +12,7 @@
               item-value="part_id" label="Select Core"></v-select>
             <v-select v-model="newBuild.leg_id" :items="filteredParts('legs')" item-title="parts_name"
               item-value="part_id" label="Select Leg"></v-select>
-            <v-select v-model="newBuild.option_parts" :items="filteredParts('weapon')" item-title="parts_name"
+            <v-select v-model="newBuild.option_parts" :items="filteredParts('option')" item-title="parts_name"
               item-value="part_id" label="Select Option Parts" multiple></v-select>
             <v-btn :disabled="!valid || loading || costOver || powerOver || optionPartsOver" @click="submit"
               color="primary">
@@ -164,7 +164,11 @@ const fetchParts = async () => {
 };
 
 const filteredParts = (type) => {
-  return parts.value.filter(part => part.part_type === type);
+  if (type == 'option'){
+    return parts.value.filter(part => part.part_type === 'weapon' || part.part_type === 'sensor');
+  } else {
+    return parts.value.filter(part => part.part_type === type);
+  }
 };
 
 const submit = async () => {
