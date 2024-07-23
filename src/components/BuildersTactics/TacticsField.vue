@@ -5,11 +5,13 @@
                 <div v-for="(cell, cellIndex) in row" :key="cellIndex" class="grid-cell">
                     <v-tooltip bottom :open-on-focus=false :open-on-hover=true :open-on-click=true>
                         <template v-slot:activator="{ props }">
-                            <v-card v-bind="props" :class="{ 'pa-2': true, 'square-card': true }" @click="selectCell(rowIndex, cellIndex)"
+                            <v-card v-bind="props" :class="{ 'pa-2': true, 'square-card': true }"
+                                @click="selectCell(rowIndex, cellIndex)"
                                 :style="{ borderColor: getTeamColor(cell.unit), borderWidth: '2px', borderStyle: 'solid' }">
                                 <v-card-title>
                                     <div v-if="cell.unit" class="unit-container">
-                                        <v-img :src="getUnitImage(cell.unit)" alt="unit image" :class="{ 'unit-image': true }">
+                                        <v-img :src="getUnitImage(cell.unit)" alt="unit image"
+                                            :class="{ 'unit-image': true }">
                                             <v-icon :color="getTeamColor(cell.unit)" :style="iconStyle"
                                                 class="team-icon-overlay">
                                                 {{ getTeamIcon(cell.unit) }}
@@ -24,6 +26,42 @@
                                             </v-icon>
                                         </v-img>
                                     </div>
+                                    <div v-if="!cell.unit" class="unit-container">
+                                        <v-img v-if="cell.optical"
+                                            :src="getSearchImage(cell.optical)"
+                                            alt="unit image" :class="{ 'unit-image': true }">
+                                        </v-img>
+                                        <v-icon :color="getSearchColor(cell.optical)"
+                                            :style="iconStyle" class="team-icon-overlay">
+                                            {{ getSearchIcon(cell.optical) }}
+                                        </v-icon>
+                                        <v-icon :color="getSearchColor(cell.optical)"
+                                            :style="iconStyle" class="sound-icon-overlay">
+                                            {{ getSound(cell.sound) }}
+                                        </v-icon>
+                                        <v-icon :color="getSearchColor(cell.optical)"
+                                            :style="iconStyle" class="heat-icon-overlay">
+                                            {{ getHeat(cell.heat) }}
+                                        </v-icon>
+                                    </div>
+                                    <!-- <div v-if="!cell.unit" class="unit-container">
+                                        <v-img v-if="searchArea[rowIndex][cellIndex].optical"
+                                            :src="getSearchImage(searchArea[rowIndex][cellIndex].optical)"
+                                            alt="unit image" :class="{ 'unit-image': true }">
+                                        </v-img>
+                                        <v-icon :color="getSearchColor(searchArea[rowIndex][cellIndex].optical)"
+                                            :style="iconStyle" class="team-icon-overlay">
+                                            {{ getSearchIcon(searchArea[rowIndex][cellIndex].optical) }}
+                                        </v-icon>
+                                        <v-icon :color="getSearchColor(searchArea[rowIndex][cellIndex].optical)"
+                                            :style="iconStyle" class="sound-icon-overlay">
+                                            {{ getSound(searchArea[rowIndex][cellIndex].sound) }}
+                                        </v-icon>
+                                        <v-icon :color="getSearchColor(searchArea[rowIndex][cellIndex].optical)"
+                                            :style="iconStyle" class="heat-icon-overlay">
+                                            {{ getHeat(searchArea[rowIndex][cellIndex].heat) }}
+                                        </v-icon>
+                                    </div> -->
                                     <div v-if="cell.initial_area && !cell.unit && gameInfo.phase == 'initialize'"
                                         class="unit-container">
                                         <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle"
@@ -32,7 +70,8 @@
                                         </v-icon>
                                     </div>
                                 </v-card-title>
-                                <v-img v-if="canSelect(rowIndex, cellIndex)" :src="highlightImage" class="overlay"></v-img>
+                                <v-img v-if="canSelect(rowIndex, cellIndex)" :src="highlightImage"
+                                    class="overlay"></v-img>
                             </v-card>
                         </template>
                         <span>{{ getUnitInfo(cell.unit) }}</span>
@@ -73,6 +112,7 @@ const emit = defineEmits(['action', 'fetchParts']);
 const store = useStore();
 const field = computed(() => store.getters['buildersTacticsStore/field']);
 const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
+// const searchArea = computed(() => gameInfo.value.search_area);
 const builds = computed(() => store.getters['buildersTacticsStore/builds']);
 const units = computed(() => store.getters['buildersTacticsStore/units']);
 const parts = computed(() => store.getters['buildersTacticsStore/parts']);
@@ -86,7 +126,7 @@ const selectedPart = ref(null);
 const showPartsDialog = ref(false);
 const highlightImage = 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="lightblue"/></svg>')
 
-const selectCell = async(rowIndex, cellIndex) => {
+const selectCell = async (rowIndex, cellIndex) => {
     const newField = JSON.parse(JSON.stringify(field.value));
     if (gameInfo.value.status === 'in_game') {
         const player = gameInfo.value.teams.flat().find(player => player.player_id === player_id.value);
@@ -104,7 +144,7 @@ const selectCell = async(rowIndex, cellIndex) => {
                     store.dispatch('buildersTacticsStore/setSelectedUnit', newField[rowIndex][cellIndex].unit)
                     const unit = units.value.find(u => u.unit_id === selectedUnit.value);
                     const build = builds.value.find(b => b.build_id === unit.build_id);
-                    if (build != selectedBuild.value){
+                    if (build != selectedBuild.value) {
                         store.dispatch('buildersTacticsStore/setSelectedBuild', build)
                         const fetchParts = () => {
                             return new Promise((resolve) => {
@@ -143,13 +183,13 @@ const selectCell = async(rowIndex, cellIndex) => {
 
 const getUnitInfo = (unitId) => {
     const unit = units.value.find(u => u.unit_id === unitId);
-    if (unit){
+    if (unit) {
         const build = builds.value.find(b => b.build_id === unit.build_id);
-        return "HP:"+unit.hp+"\nCost:"+build.total_cost+"\nPower:"+build.total_power;
-    } else if(unitId != null) {
+        return "HP:" + unit.hp + "\nCost:" + build.total_cost + "\nPower:" + build.total_power;
+    } else if (unitId != null) {
         const build = builds.value.find(b => b.build_id === unitId);
-        if (build){
-            return "HP:"+build.max_hp+"\nCost:"+build.total_cost+"\nPower:"+build.total_power;
+        if (build) {
+            return "HP:" + build.max_hp + "\nCost:" + build.total_cost + "\nPower:" + build.total_power;
         } else {
             return "No your unit";
         }
@@ -161,7 +201,7 @@ const getUnitInfo = (unitId) => {
 const getUnitImage = (unitId) => {
     const unit = units.value.find(u => u.unit_id === unitId);
     if (unit) {
-        if (unit.is_exist){
+        if (unit.is_exist) {
             const build = builds.value.find(b => b.build_id === unit.build_id);
             return build ? build.build_image_url : '';
         } else {
@@ -172,6 +212,10 @@ const getUnitImage = (unitId) => {
         return build ? build.build_image_url : '';
     }
 };
+
+const getSearchImage = (optical) => {
+    return optical.image_url ? optical.image_url : '';
+}
 
 const getTeamColor = (Id) => {
     var targetId = Id;
@@ -189,6 +233,25 @@ const getTeamColor = (Id) => {
     return 'transparent';
 };
 
+const getSearchColor = (optical) => {
+    if (optical){
+        if (optical.player) {
+            for (let i = 0; i < gameInfo.value.teams.length; i++) {
+                const team = gameInfo.value.teams[i];
+                if (team.some(player => player.player_id === optical.player)) {
+                    return teamInfo.value.colors[i];
+                }
+            }
+        } else if (optical.enemy) {
+            return 'black';
+        } else {
+            return 'transparent';
+        }
+    } else {
+        return 'black';
+    }
+}
+
 const getTeamIcon = (Id) => {
     var targetId = Id;
     const unit = units.value.find(u => u.unit_id === Id);
@@ -204,6 +267,84 @@ const getTeamIcon = (Id) => {
     }
     return '';
 };
+
+const getSearchIcon = (optical) => {
+    if (optical) {
+        if (optical.player) {
+            for (let i = 0; i < gameInfo.value.teams.length; i++) {
+                const team = gameInfo.value.teams[i];
+                if (team.some(player => player.player_id === optical.player)) {
+                    return teamInfo.value.icons[i];
+                }
+            }
+        } else if (optical.enemy) {
+            return 'mdi-skull-outline';
+        } else {
+            return '';
+        }
+    } else {
+        return '';
+    }
+}
+
+const getSound = (sound) => {
+    if (sound) {
+        if (sound.sound) {
+            if (sound.sound == 'two_leg') {
+                return 'mdi-foot-print'
+            } else if (sound.sound == 'multi_leg') {
+                return 'mdi-spider'
+            } else if (sound.sound == 'caterpillar') {
+                return 'mdi-tank'
+            } else if (sound.sound == 'jet') {
+                return 'mdi-airplane'
+            } else if (sound.sound == 'propeller') {
+                return 'mdi-wind-power'
+            } else if (sound.sound == 'infight') {
+                return 'mdi-sword'
+            } else if (sound.sound == 'bullet') {
+                console.error("bullet")
+                return 'mdi-ammunition'
+            } else if (sound.sound == 'energy') {
+                return 'mdi-lighting-bolt'
+            } else if (sound.sound == 'break') {
+                return 'mdi-skull-crossbones';
+            } else {
+                return '';
+            }
+        } else if (sound.sound_type) {
+            if (sound.sound_type == 'attack') {
+                return 'mdi-sword-cross';
+            } else if (sound.sound_type == 'move') {
+                return 'mdi-shoe-print';
+            } else if (sound.sound_type == 'break') {
+                return 'mdi-skull-crossbones';
+            } else {
+                return '';
+            }
+        } else if (sound.enemy) {
+            return 'mdi-skull';
+        } else {
+            return '';
+        }
+    } else {
+        return '';
+    }
+}
+
+const getHeat = (heat) => {
+    if (heat){
+        if (heat.heat) {
+            return heat.heat;
+        } else if (heat.enemy) {
+            return 'mdi-skull';
+        } else {
+            return '';
+        }
+    } else {
+        return '';
+    } 
+}
 
 const getAttacked = (Id) => {
     const unit = units.value.find(u => u.unit_id === Id);
@@ -233,7 +374,7 @@ const getMoved = (Id) => {
 
 const canSelect = (row, col) => {
     if (selectedUnit.value != null && selectedPart.value != null && gameInfo.value.phase_player == player_id.value) {
-        try{
+        try {
             var unit_row = -1
             var unit_col = -1
             for (let i = 0; i < field.value.length; i++) {
@@ -249,29 +390,29 @@ const canSelect = (row, col) => {
             const part = parts.value.find(part => part.part_id == selectedPart.value);
             if (unit_row == -1 || unit_col == -1) {
                 return false;
-            } else if(part.part_type == 'legs' && gameInfo.value.phase == 'move'){
+            } else if (part.part_type == 'legs' && gameInfo.value.phase == 'move') {
                 let move_type_flag = false;
                 const move_y = Math.abs(row - unit_row);
                 const move_x = Math.abs(col - unit_col);
                 const distance = move_y + move_x;
                 const range = part.move_area;
-                if(part.move_type == 'cross'){
+                if (part.move_type == 'cross') {
                     move_type_flag = (move_y == move_x);
-                }else if(part.move_type == 'straight'){
+                } else if (part.move_type == 'straight') {
                     move_type_flag = (move_y == 0) || (move_x == 0);
-                }else if(part.move_type == 'free'){
+                } else if (part.move_type == 'free') {
                     move_type_flag = true;
                 }
                 return (distance <= range) && move_type_flag;
-    
-            } else if(part.part_type == 'weapon' && gameInfo.value.phase != 'move') {
+
+            } else if (part.part_type == 'weapon' && gameInfo.value.phase != 'move') {
                 const distance = Math.abs(row - unit_row) + Math.abs(col - unit_col);
                 const range = part.attack_area;
                 return distance <= range;
             } else {
                 return false;
             }
-        }catch{
+        } catch {
             store.dispatch('buildersTacticsStore/setSelectedUnit', null)
             selectedPart.value = null
             return false;
@@ -402,6 +543,22 @@ onUnmounted(() => {
 }
 
 .moved-icon-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.8;
+    color: inherit;
+}
+
+.sound-icon-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    opacity: 0.8;
+    color: inherit;
+}
+
+.heat-icon-overlay {
     position: absolute;
     top: 0;
     right: 0;
