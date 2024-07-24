@@ -27,22 +27,26 @@
                                         </v-img>
                                     </div>
                                     <div v-if="!cell.unit" class="unit-container">
-                                        <v-img v-if="cell.optical"
-                                            :src="getSearchImage(cell.optical)"
-                                            alt="unit image" :class="{ 'unit-image': true }">
+                                        <v-img v-if="cell.optical" :src="getSearchImage(cell.optical)" alt="unit image"
+                                            :class="{ 'unit-image': true }">
                                         </v-img>
-                                        <v-icon :color="getSearchColor(cell.optical)"
-                                            :style="iconStyle" class="team-icon-overlay">
+                                        <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
+                                            class="team-icon-overlay">
                                             {{ getSearchIcon(cell.optical) }}
                                         </v-icon>
-                                        <v-icon :color="getSearchColor(cell.optical)"
-                                            :style="iconStyle" class="sound-icon-overlay">
+                                        <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
+                                            class="sound-icon-overlay">
                                             {{ getSound(cell.sound) }}
                                         </v-icon>
-                                        <v-icon :color="getSearchColor(cell.optical)"
-                                            :style="iconStyle" class="heat-icon-overlay">
-                                            {{ getHeat(cell.heat) }}
-                                        </v-icon>
+                                        <div class="heat-icon-container">
+                                            <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
+                                                class="heat-icon-overlay">
+                                                {{ getHeat(cell.heat) }}
+                                            </v-icon>
+                                            <v-badge v-if="cell.heat?.heat" :color="getSearchColor(cell.optical)"
+                                                :content="getHeatNumber(cell.heat)" class="heat-badge-overlay" overlap>
+                                            </v-badge>
+                                        </div>
                                     </div>
                                     <!-- <div v-if="!cell.unit" class="unit-container">
                                         <v-img v-if="searchArea[rowIndex][cellIndex].optical"
@@ -234,7 +238,7 @@ const getTeamColor = (Id) => {
 };
 
 const getSearchColor = (optical) => {
-    if (optical){
+    if (optical) {
         if (optical.player) {
             for (let i = 0; i < gameInfo.value.teams.length; i++) {
                 const team = gameInfo.value.teams[i];
@@ -333,9 +337,9 @@ const getSound = (sound) => {
 }
 
 const getHeat = (heat) => {
-    if (heat){
+    if (heat) {
         if (heat.heat) {
-            return heat.heat;
+            return 'mdi-fire';
         } else if (heat.enemy) {
             return 'mdi-skull';
         } else {
@@ -343,7 +347,19 @@ const getHeat = (heat) => {
         }
     } else {
         return '';
-    } 
+    }
+}
+
+const getHeatNumber = (heat) => {
+    if (heat) {
+        if (heat.heat) {
+            return heat.heat;
+        } else {
+            return '';
+        }
+    } else {
+        return '';
+    }
 }
 
 const getAttacked = (Id) => {
@@ -558,10 +574,23 @@ onUnmounted(() => {
     color: inherit;
 }
 
-.heat-icon-overlay {
+.heat-icon-container {
     position: absolute;
     top: 0;
     right: 0;
+    display: inline-block;
+}
+
+.heat-icon-overlay {
+    position: relative;
+    opacity: 0.8;
+    color: inherit;
+}
+
+.heat-badge-overlay {
+    position: absolute;
+    top: 20%;
+    right: 20%;
     opacity: 0.8;
     color: inherit;
 }
