@@ -47,6 +47,9 @@
               <v-card-subtitle>Power: {{ headParts.power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ headParts.cost }}</v-card-subtitle>
               <v-card-subtitle>HP: {{ headParts.hp }}</v-card-subtitle>
+              <v-card-subtitle>Search range: {{ part.search_area }}</v-card-subtitle>
+              <v-card-subtitle>Search level: {{ part.search_level }}</v-card-subtitle>
+              <v-card-subtitle>Search type: {{ part.search_type }}</v-card-subtitle>
             </v-card>
           </v-col>
           <v-col cols="12" md="4">
@@ -56,6 +59,8 @@
               <v-card-subtitle>Power: {{ coreParts.power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ coreParts.cost }}</v-card-subtitle>
               <v-card-subtitle>HP: {{ coreParts.hp }}</v-card-subtitle>
+              <v-card-subtitle>Max power: {{ part.max_power }}</v-card-subtitle>
+              <v-card-subtitle>Max option parts number: {{ part.option_parts_number }}</v-card-subtitle>
             </v-card>
           </v-col>
           <v-col cols="12" md="4">
@@ -65,6 +70,11 @@
               <v-card-subtitle>Power: {{ legParts.power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ legParts.cost }}</v-card-subtitle>
               <v-card-subtitle>HP: {{ legParts.hp }}</v-card-subtitle>
+              <v-card-subtitle>Max cost: {{ part.max_cost }}</v-card-subtitle>
+              <v-card-subtitle>Move range: {{ part.move_area }}</v-card-subtitle>
+              <v-card-subtitle>Move type: {{ part.move_type }}</v-card-subtitle>
+              <v-card-subtitle>Sound: {{ part.sound }}</v-card-subtitle>
+              <v-card-subtitle>Sound type: {{ part.sound_type }}</v-card-subtitle>
             </v-card>
           </v-col>
           <v-col v-for="part in optionParts" :key="part.part_id" cols="12" md="4">
@@ -74,6 +84,15 @@
               <v-card-subtitle>Power: {{ part.power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ part.cost }}</v-card-subtitle>
               <v-card-subtitle>HP: {{ part.hp }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.attack_area">Attack range: {{ part.attack_area }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.full_attack">Full attack: {{ part.full_attack }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.defense">Defense: {{ part.defense }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.blitz">Blitz: {{ part.blitz }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.search_area">Search range: {{ part.search_area }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.search_level">Search level: {{ part.search_level }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.search_type">Search type: {{ part.search_type }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.sound">Sound: {{ part.sound }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.sound_type">Sound type: {{ part.sound_type }}</v-card-subtitle>
             </v-card>
           </v-col>
         </v-row>

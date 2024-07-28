@@ -28,7 +28,7 @@
                                     </div>
                                     <div v-if="!cell.unit" class="unit-container">
                                         <v-img v-if="cell.optical" :src="getSearchImage(cell.optical)" alt="unit image"
-                                        :class="{ 'unit-image': true }">
+                                            :class="{ 'unit-image': true }">
                                         </v-img>
                                         <div v-if="cell.optical" class="optical-icon-container">
                                             <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
@@ -97,7 +97,8 @@
                                     class="overlay"></v-img>
                             </v-card>
                         </template>
-                        <span>{{ getUnitInfo(cell.unit) }}</span>
+                        <span v-if="cell.unit" v-html="getUnitInfo(cell.unit)"></span>
+                        <span v-if="!cell.unit" v-html="getSearchResult(rowIndex, cellIndex)"></span>
                     </v-tooltip>
                 </div>
             </div>
@@ -210,17 +211,27 @@ const getUnitInfo = (unitId) => {
     const unit = units.value.find(u => u.unit_id === unitId);
     if (unit) {
         const build = builds.value.find(b => b.build_id === unit.build_id);
-        return "HP:" + unit.hp + "\nCost:" + build.total_cost + "\nPower:" + build.total_power;
+        return "HP: " + unit.hp + "<br>Cost: " + build.total_cost + "<br>Power: " + build.total_power + "<br>Can move: " + (unit.can_attack && unit.can_move) + "<br>Can attack: " + unit.can_attack ;
     } else if (unitId != null) {
         const build = builds.value.find(b => b.build_id === unitId);
         if (build) {
-            return "HP:" + build.max_hp + "\nCost:" + build.total_cost + "\nPower:" + build.total_power;
+            return "HP: " + build.max_hp + "<br>Cost: " + build.total_cost + "<br>Power: " + build.total_power;
         } else {
             return "No your unit";
         }
     } else {
         return "No your unit";
     }
+};
+
+const getSearchResult = (row, cell) => {
+    const searchOptical = 'Search 【Optical:' + (searchArea.value[row][cell].optical? searchArea.value[row][cell].optical : 'No data');
+    const searchSound = ', Sound:' + (searchArea.value[row][cell].sound? searchArea.value[row][cell].sound : 'No data');
+    const searchHeat = ', Heat:' + (searchArea.value[row][cell].heat? searchArea.value[row][cell].heat : 'No data') + '】';
+    const optical = '<br>Optical【Enemy:' + (field.value[row][cell].optical?.enemy? field.value[row][cell].optical.enemy : 'No data') + ', Player:'  + (field.value[row][cell].optical?.player? field.value[row][cell].optical.player : 'No data') + '】';
+    const sound = '<br>Sound【Enemy:' + (field.value[row][cell].sound?.enemy? field.value[row][cell].sound.enemy : 'No data') + ', Type:' + (field.value[row][cell].sound?.sound_type? field.value[row][cell].sound.sound_type : 'No data') + ', Sound:' + (field.value[row][cell].sound?.sound? field.value[row][cell].sound.sound : 'No data') + '】' ;
+    const heat = '<br>Heat【Enemy:' + (field.value[row][cell].heat?.enemy? field.value[row][cell].heat.enemy : 'No data') + ', Heat:' + (field.value[row][cell].heat?.heat? field.value[row][cell].heat.heat : 'No data') + '】' ;
+    return searchOptical + searchSound + searchHeat + optical + sound + heat;
 };
 
 const getUnitImage = (unitId) => {
