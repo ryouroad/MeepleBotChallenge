@@ -47,9 +47,9 @@
               <v-card-subtitle>Power: {{ headParts.power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ headParts.cost }}</v-card-subtitle>
               <v-card-subtitle>HP: {{ headParts.hp }}</v-card-subtitle>
-              <v-card-subtitle>Search range: {{ part.search_area }}</v-card-subtitle>
-              <v-card-subtitle>Search level: {{ part.search_level }}</v-card-subtitle>
-              <v-card-subtitle>Search type: {{ part.search_type }}</v-card-subtitle>
+              <v-card-subtitle>Search range: {{ headParts.search_area }}</v-card-subtitle>
+              <v-card-subtitle>Search level: {{ headParts.search_level }}</v-card-subtitle>
+              <v-card-subtitle>Search type: {{ headParts.search_type }}</v-card-subtitle>
             </v-card>
           </v-col>
           <v-col cols="12" md="4">
@@ -59,8 +59,8 @@
               <v-card-subtitle>Power: {{ coreParts.power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ coreParts.cost }}</v-card-subtitle>
               <v-card-subtitle>HP: {{ coreParts.hp }}</v-card-subtitle>
-              <v-card-subtitle>Max power: {{ part.max_power }}</v-card-subtitle>
-              <v-card-subtitle>Max option parts number: {{ part.option_parts_number }}</v-card-subtitle>
+              <v-card-subtitle>Max power: {{ coreParts.max_power }}</v-card-subtitle>
+              <v-card-subtitle>Max option parts number: {{ coreParts.option_parts_number }}</v-card-subtitle>
             </v-card>
           </v-col>
           <v-col cols="12" md="4">
@@ -70,11 +70,11 @@
               <v-card-subtitle>Power: {{ legParts.power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ legParts.cost }}</v-card-subtitle>
               <v-card-subtitle>HP: {{ legParts.hp }}</v-card-subtitle>
-              <v-card-subtitle>Max cost: {{ part.max_cost }}</v-card-subtitle>
-              <v-card-subtitle>Move range: {{ part.move_area }}</v-card-subtitle>
-              <v-card-subtitle>Move type: {{ part.move_type }}</v-card-subtitle>
-              <v-card-subtitle>Sound: {{ part.sound }}</v-card-subtitle>
-              <v-card-subtitle>Sound type: {{ part.sound_type }}</v-card-subtitle>
+              <v-card-subtitle>Max cost: {{ legParts.max_cost }}</v-card-subtitle>
+              <v-card-subtitle>Move range: {{ legParts.move_area }}</v-card-subtitle>
+              <v-card-subtitle>Move type: {{ legParts.move_type }}</v-card-subtitle>
+              <v-card-subtitle>Sound: {{ legParts.sound }}</v-card-subtitle>
+              <v-card-subtitle>Sound type: {{ legParts.sound_type }}</v-card-subtitle>
             </v-card>
           </v-col>
           <v-col v-for="part in optionParts" :key="part.part_id" cols="12" md="4">
