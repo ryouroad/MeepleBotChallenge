@@ -18,54 +18,73 @@
                                             </v-icon>
                                             <v-icon v-if="!getAttacked(cell.unit)" :color="getTeamColor(cell.unit)"
                                                 :style="iconStyle" class="attacked-icon-overlay">
-                                                mdi-sword-cross
+                                                {{ icons['attack'] }}
                                             </v-icon>
                                             <v-icon v-if="!getMoved(cell.unit)" :color="getTeamColor(cell.unit)"
                                                 :style="iconStyle" class="moved-icon-overlay">
-                                                mdi-shoe-print
+                                                {{ icons['move'] }}
                                             </v-icon>
                                         </v-img>
                                     </div>
                                     <div v-if="!cell.unit" class="unit-container">
                                         <v-img v-if="cell.optical" :src="getSearchImage(cell.optical)" alt="unit image"
-                                            :class="{ 'unit-image': true }">
+                                        :class="{ 'unit-image': true }">
                                         </v-img>
-                                        <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
-                                            class="team-icon-overlay">
-                                            {{ getSearchIcon(cell.optical) }}
-                                        </v-icon>
-                                        <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
-                                            class="sound-icon-overlay">
-                                            {{ getSound(cell.sound) }}
-                                        </v-icon>
-                                        <div class="heat-icon-container">
+                                        <div v-if="cell.optical" class="optical-icon-container">
+                                            <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
+                                                class="team-icon-overlay">
+                                                {{ getSearchIcon(cell.optical) }}
+                                            </v-icon>
+                                        </div>
+                                        <div v-if="displaySearch && !cell.optical && searchArea[rowIndex][cellIndex].optical"
+                                            class="optical-icon-container">
+                                            <v-icon :color="getTeamColor(player_id)" :style="iconStyle"
+                                                class="optical-icon-overlay">
+                                                {{ icons['optical'] }}
+                                            </v-icon>
+                                            <v-badge :color="getTeamColor(player_id)"
+                                                :content="getSearchLevel(searchArea[rowIndex][cellIndex].optical)"
+                                                class="badge-overlay" overlap>
+                                            </v-badge>
+                                        </div>
+                                        <div v-if="cell.sound" class="sound-icon-container">
+                                            <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
+                                                class="sound-icon-overlay">
+                                                {{ getSound(cell.sound) }}
+                                            </v-icon>
+                                        </div>
+                                        <div v-if="displaySearch && !cell.sound && searchArea[rowIndex][cellIndex].sound"
+                                            class="sound-icon-container">
+                                            <v-icon :color="getTeamColor(player_id)" :style="iconStyle"
+                                                class="sound-icon-overlay">
+                                                {{ icons['sound'] }}
+                                            </v-icon>
+                                            <v-badge :color="getTeamColor(player_id)"
+                                                :content="getSearchLevel(searchArea[rowIndex][cellIndex].sound)"
+                                                class="badge-overlay" overlap>
+                                            </v-badge>
+                                        </div>
+                                        <div v-if="cell.heat" class="heat-icon-container">
                                             <v-icon :color="getSearchColor(cell.optical)" :style="iconStyle"
                                                 class="heat-icon-overlay">
                                                 {{ getHeat(cell.heat) }}
                                             </v-icon>
                                             <v-badge v-if="cell.heat?.heat" :color="getSearchColor(cell.optical)"
-                                                :content="getHeatNumber(cell.heat)" class="heat-badge-overlay" overlap>
+                                                :content="getHeatNumber(cell.heat)" class="badge-overlay" overlap>
+                                            </v-badge>
+                                        </div>
+                                        <div v-if="displaySearch && !cell.heat && searchArea[rowIndex][cellIndex].heat"
+                                            class="heat-icon-container">
+                                            <v-icon :color="getTeamColor(player_id)" :style="iconStyle"
+                                                class="heat-icon-overlay">
+                                                {{ icons['heat'] }}
+                                            </v-icon>
+                                            <v-badge :color="getTeamColor(player_id)"
+                                                :content="getSearchLevel(searchArea[rowIndex][cellIndex].heat)"
+                                                class="badge-overlay" overlap>
                                             </v-badge>
                                         </div>
                                     </div>
-                                    <!-- <div v-if="!cell.unit" class="unit-container">
-                                        <v-img v-if="searchArea[rowIndex][cellIndex].optical"
-                                            :src="getSearchImage(searchArea[rowIndex][cellIndex].optical)"
-                                            alt="unit image" :class="{ 'unit-image': true }">
-                                        </v-img>
-                                        <v-icon :color="getSearchColor(searchArea[rowIndex][cellIndex].optical)"
-                                            :style="iconStyle" class="team-icon-overlay">
-                                            {{ getSearchIcon(searchArea[rowIndex][cellIndex].optical) }}
-                                        </v-icon>
-                                        <v-icon :color="getSearchColor(searchArea[rowIndex][cellIndex].optical)"
-                                            :style="iconStyle" class="sound-icon-overlay">
-                                            {{ getSound(searchArea[rowIndex][cellIndex].sound) }}
-                                        </v-icon>
-                                        <v-icon :color="getSearchColor(searchArea[rowIndex][cellIndex].optical)"
-                                            :style="iconStyle" class="heat-icon-overlay">
-                                            {{ getHeat(searchArea[rowIndex][cellIndex].heat) }}
-                                        </v-icon>
-                                    </div> -->
                                     <div v-if="cell.initial_area && !cell.unit && gameInfo.phase == 'initialize'"
                                         class="unit-container">
                                         <v-icon :color="getTeamColor(cell.initial_area)" :style="iconStyle"
@@ -90,11 +109,11 @@
                     <v-list-item v-for="part in filteredParts()" :key="part.part_id" @click="selectPart(part)">
                         <v-list-item-content>
                             <strong class="mx-2">{{ part.parts_name }}</strong>
-                            <v-icon left class="mx-2">mdi-sword</v-icon>
+                            <v-icon left class="mx-2">{{ icons['full_attack'] }}</v-icon>
                             <span class="mx-2">{{ part.full_attack }}</span>
-                            <v-icon left class="mx-2">mdi-shield</v-icon>
+                            <v-icon left class="mx-2">{{ icons['defense'] }}</v-icon>
                             <span class="mx-2">{{ part.defense }}</span>
-                            <v-icon left class="mx-2">mdi-flash</v-icon>
+                            <v-icon left class="mx-2">{{ icons['blitz'] }}</v-icon>
                             <span class="mx-2">{{ part.blitz }}</span>
                         </v-list-item-content>
                     </v-list-item>
@@ -116,13 +135,15 @@ const emit = defineEmits(['action', 'fetchParts']);
 const store = useStore();
 const field = computed(() => store.getters['buildersTacticsStore/field']);
 const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
-// const searchArea = computed(() => gameInfo.value.search_area);
+const searchArea = computed(() => gameInfo.value.search_area);
 const builds = computed(() => store.getters['buildersTacticsStore/builds']);
 const units = computed(() => store.getters['buildersTacticsStore/units']);
 const parts = computed(() => store.getters['buildersTacticsStore/parts']);
 const teamInfo = computed(() => store.getters['buildersTacticsStore/teamInfo']);
+const icons = computed(() => store.getters['buildersTacticsStore/icons']);
 const selectedBuild = computed(() => store.getters['buildersTacticsStore/selectedBuild']);
 const selectedUnit = computed(() => store.getters['buildersTacticsStore/selectedUnit']);
+const displaySearch = computed(() => store.getters['buildersTacticsStore/displaySearch']);
 const player_id = computed(() => store.getters['authStore/getName']);
 const iconSize = ref(0);
 const targetCell = ref(null);
@@ -282,7 +303,7 @@ const getSearchIcon = (optical) => {
                 }
             }
         } else if (optical.enemy) {
-            return 'mdi-skull-outline';
+            return icons.value['enemy'];
         } else {
             return '';
         }
@@ -294,40 +315,11 @@ const getSearchIcon = (optical) => {
 const getSound = (sound) => {
     if (sound) {
         if (sound.sound) {
-            if (sound.sound == 'two_leg') {
-                return 'mdi-foot-print'
-            } else if (sound.sound == 'multi_leg') {
-                return 'mdi-spider'
-            } else if (sound.sound == 'caterpillar') {
-                return 'mdi-tank'
-            } else if (sound.sound == 'jet') {
-                return 'mdi-airplane'
-            } else if (sound.sound == 'propeller') {
-                return 'mdi-wind-power'
-            } else if (sound.sound == 'infight') {
-                return 'mdi-sword'
-            } else if (sound.sound == 'bullet') {
-                console.error("bullet")
-                return 'mdi-ammunition'
-            } else if (sound.sound == 'energy') {
-                return 'mdi-lighting-bolt'
-            } else if (sound.sound == 'break') {
-                return 'mdi-skull-crossbones';
-            } else {
-                return '';
-            }
+            return icons.value[sound.sound];
         } else if (sound.sound_type) {
-            if (sound.sound_type == 'attack') {
-                return 'mdi-sword-cross';
-            } else if (sound.sound_type == 'move') {
-                return 'mdi-shoe-print';
-            } else if (sound.sound_type == 'break') {
-                return 'mdi-skull-crossbones';
-            } else {
-                return '';
-            }
+            return icons.value[sound.sound_type];
         } else if (sound.enemy) {
-            return 'mdi-skull';
+            return icons.value['enemy'];
         } else {
             return '';
         }
@@ -339,9 +331,9 @@ const getSound = (sound) => {
 const getHeat = (heat) => {
     if (heat) {
         if (heat.heat) {
-            return 'mdi-fire';
+            return icons.value['heat'];
         } else if (heat.enemy) {
-            return 'mdi-skull';
+            return icons.value['enemy'];
         } else {
             return '';
         }
@@ -360,6 +352,15 @@ const getHeatNumber = (heat) => {
     } else {
         return '';
     }
+}
+
+const getSearchLevel = (level) => {
+    const level_char = {
+        low: 'L',
+        middle: 'M',
+        high: 'H',
+    }
+    return level_char[level];
 }
 
 const getAttacked = (Id) => {
@@ -566,10 +567,28 @@ onUnmounted(() => {
     color: inherit;
 }
 
-.sound-icon-overlay {
+.sound-icon-container {
     position: absolute;
     bottom: 0;
     left: 0;
+    display: inline-block;
+}
+
+.sound-icon-overlay {
+    position: relative;
+    opacity: 0.8;
+    color: inherit;
+}
+
+.optical-icon-container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: inline-block;
+}
+
+.optical-icon-overlay {
+    position: relative;
     opacity: 0.8;
     color: inherit;
 }
@@ -587,7 +606,7 @@ onUnmounted(() => {
     color: inherit;
 }
 
-.heat-badge-overlay {
+.badge-overlay {
     position: absolute;
     top: 20%;
     right: 20%;

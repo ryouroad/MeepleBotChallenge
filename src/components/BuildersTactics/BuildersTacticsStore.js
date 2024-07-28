@@ -23,6 +23,27 @@ export const buildersTacticsStore = {
         selectedBuild: null,
         parts: [],
         selectedUnit: null,
+        icons: { 
+            enemy: 'mdi-skull',
+            two_leg: 'mdi-foot-print',
+            multi_leg: 'mdi-spiedr',
+            caterpillar: 'mdi-tank',
+            jet: 'mdi-airplane',
+            propellar: 'mdi-wind-power',
+            infight: 'mdi-sword',
+            bullet: 'mdi-ammunition',
+            enrgy: 'mdi-lighting-bolt',
+            break: 'mdi-skull-crossbones',
+            attack: 'mdi-sword-cross',
+            move: 'mdi-shoe-print',
+            optical: 'mdi-crosshairs-gps',
+            sound: 'mdi-volume-medium',            
+            heat: 'mdi-fire',
+            full_attack: 'mdi-sword',
+            defense: 'mdi-shield',
+            blitz: 'mdi-flash',
+        },
+        displaySearch: true,
     },
     mutations: {
         setCurrentGameId(state, gameId) {
@@ -48,6 +69,9 @@ export const buildersTacticsStore = {
         },
         setSelectedUnit(state, unit){
             state.selectedUnit = unit;
+        },
+        setDisplaySearch(state, displaySearch){
+            state.displaySearch = displaySearch;
         }
     },
     actions: {
@@ -75,6 +99,9 @@ export const buildersTacticsStore = {
         setSelectedUnit({ commit }, unit) {
             commit('setSelectedUnit', unit);
         },
+        setDisplaySearch({ commit }, displaySearch) {
+            commit('setDisplaySearch', displaySearch);
+        },
     },
     getters: {
         currentGameId: state => state.currentGameId,
@@ -86,5 +113,7 @@ export const buildersTacticsStore = {
         selectedBuild: state => state.selectedBuild,
         parts: state => state.parts,
         selectedUnit: state => state.selectedUnit,
+        icons: state => state.icons,
+        displaySearch: state => state.displaySearch,
     },
 };

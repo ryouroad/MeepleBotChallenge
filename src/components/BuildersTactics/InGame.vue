@@ -10,10 +10,10 @@
         </v-list-item>
         <v-divider class="my-4"></v-divider>
         <v-row id="menu-viewer" class="d-flex justify-center" cols="12">
-            <v-col cols="12" md="4" class="d-flex justify-center">
+            <v-col cols="12" md="3" class="d-flex justify-center">
                 <v-btn @click="fetchGameInfo" color="primary">フィールド更新</v-btn>
             </v-col>
-            <v-col cols="12" md="4" class="d-flex justify-center">
+            <v-col cols="12" md="3" class="d-flex justify-center">
                 <v-btn v-if="gameInfo.phase === 'initialize' && getAgreement() === 'agree'" @click="completePlacement" color="primary">
                     ユニット配置完了
                     <v-tooltip bottom activator="parent">
@@ -24,7 +24,10 @@
                 </v-btn>
                 <v-btn v-if="gameInfo.phase !== 'initialize' && gameInfo.phase_player === playerId" @click="nextPhase" color="primary">フェイズ終了</v-btn>
             </v-col>
-            <v-col cols="12" md="4" class="d-flex justify-center">
+            <v-col cols="12" md="3" class="d-flex justify-center">
+                <v-btn v-if="gameInfo.phase !== 'initialize'" @click="switchDisplaySearch" color="primary">索敵表示切替</v-btn>
+            </v-col>
+            <v-col cols="12" md="3" class="d-flex justify-center">
                 <v-text v-if="gameInfo.phase === 'initialize' && getAgreement() === 'agree'">コスト：{{ totalCost }}</v-text>
                 <v-text v-if="gameInfo.phase === 'initialize' && getAgreement() === 'agree'">ビルド数：{{ totalBuild }}</v-text>
                 <v-btn v-if="gameInfo.phase !== 'initialize'" @click="surrender" color="primary">降参</v-btn>
@@ -45,6 +48,7 @@ const store = useStore();
 const gameInfo = computed(() => store.getters['buildersTacticsStore/gameInfo']);
 const playerId = computed(() => store.getters['authStore/getName']);
 const builds = computed(() => store.getters['buildersTacticsStore/builds']);
+const displaySearch = computed(() => store.getters['buildersTacticsStore/displaySearch']);
 const buildOver = computed(() => {
     return (totalBuild.value > gameInfo.value.setting.max_build)
 }) ;
@@ -113,6 +117,10 @@ const fetchParts = (resolve) => {
 const getAgreement = () => {
     const player = gameInfo.value.teams.flat().find(player => player.player_id === playerId.value);
     return player?.agreement
+}
+
+const switchDisplaySearch = () => {
+    store.dispatch('buildersTacticsStore/setDisplaySearch', !displaySearch.value);
 }
 
 </script>

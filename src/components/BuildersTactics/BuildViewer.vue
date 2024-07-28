@@ -41,7 +41,12 @@ const goBack = () => {
   parts.value = [];
 };
 
-onMounted(fetchBuilds);
+onMounted(async () => {
+  await fetchBuilds();
+  if(selectedBuild.value){
+    await selectBuild(selectedBuild.value);
+  }
+});
 </script>
 
 <template>
@@ -64,6 +69,20 @@ onMounted(fetchBuilds);
               <v-card-subtitle>Power: {{ part.power }}</v-card-subtitle>
               <v-card-subtitle>Cost: {{ part.cost }}</v-card-subtitle>
               <v-card-subtitle>HP: {{ part.hp }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.attack_area">Attack range: {{ part.attack_area }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.full_attack">Full attack: {{ part.full_attack }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.defense">Defense: {{ part.defense }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.blitz">Blitz: {{ part.blitz }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.max_power">Max power: {{ part.max_power }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.option_parts_number">Max option parts number: {{ part.option_parts_number }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.max_cost">Max cost: {{ part.max_cost }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.move_area">Move range: {{ part.move_area }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.move_type">Move type: {{ part.move_type }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.search_area">Search range: {{ part.search_area }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.search_level">Search level: {{ part.search_level }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.search_type">Search type: {{ part.search_type }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.sound">Sound: {{ part.sound }}</v-card-subtitle>
+              <v-card-subtitle v-if="part.sound_type">Sound type: {{ part.sound_type }}</v-card-subtitle>
             </v-card>
           </v-col>
         </v-row>
